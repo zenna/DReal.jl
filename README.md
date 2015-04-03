@@ -6,3 +6,10 @@ This is a julia wrapper for the [dReal SMT solver](https://dreal.github.io/)
 
 # Requirements
 dReal (with shared library)
+
+# Installation
+dReal.jl is not yet in the official Julia Package repository.  You can still easily install it from a Julia repl with
+
+```julia
+Pkg.clone("https://github.com/zenna/dReal.jl.git")
+```
