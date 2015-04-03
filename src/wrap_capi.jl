@@ -1,30 +1,14 @@
-
-is_dreal_initialised = false
-
 typealias opensmt_expr Ptr{Void}
 typealias opensmt_context Ptr{Void}
 
-@enum(logic,
-  qf_uf,         # Uninterpreted Functions
-  qf_nra,        # Non-Linear Real Arithmetic
-  qf_nra_ode,    # Non-Linear Real Arithmetic
-  qf_bv,         # BitVectors
-  qf_rdl,        # Real difference logics
-  qf_idl,        # Integer difference logics
-  qf_lra,        # Real linear arithmetic
-  qf_lia,        # Integer linear arithmetic
-  qf_ufidl,      # UF + IDL
-  qf_uflra,      # UF + LRA
-  qf_bool,       # Only booleans
-  qf_ct)         # Cost
-
-@enum result l_false l_undef l_true
-
-## Low Level API
-## =============
+## Communication APIs
+## =========================
+@doc "Initialise opensmt.  This (presumably?) must be called before anything else" ->
 opensmt_init() = ccall( (:opensmt_init, "libdreal"), Void, ())
-opensmt_mk_context(l::Cuint) = 
-  ccall( (:opensmt_mk_context, "libdreal"), Ptr{Void}, (Cuint,), l)
+
+@doc "Set Verboisty of dReal output" ->
+opensmt_set_verbosity(ctx::opensmt_context, level::Int) =
+  ccall((:opensmt_set_verbosity, "libdreal"), Void, (Ptr{Void}, Cint), ctx, level)
 
 @doc "(opensmt_context c, const double p)" ->
 opensmt_set_precision(ctx::opensmt_context, p::Float64) = 
@@ -34,69 +18,198 @@ opensmt_set_precision(ctx::opensmt_context, p::Float64) =
 opensmt_get_precision(ctx::opensmt_context, p::Float64) = 
   ccall( (:opensmt_get_precision, "libdreal"), Ptr{Void}, (Ptr{Void}, Float64), ctx, p)
 
-@doc "(opensmt_context, char * , double, double ) -> opensmt_expr" ->
-opensmt_mk_real_var(ctx::opensmt_context, varname::ASCIIString, lb::Float64, ub::Float64) =
+opensmt_version() = 
+  ccall( (:opensmt_version, "libdreal"), Ptr{UInt8}, ())
+
+opensmt_print_expr() = 
+  ccall( (:opensmt_print_expr, "libdreal"), Void, (Ptr{Void},))
+
+opensmt_mk_context(l::Cuint) = 
+  ccall( (:opensmt_mk_context, "libdreal"), Ptr{Void}, (Cuint,), l)
+
+opensmt_del_context(ctx::opensmt_context) = 
+  ccall( (:opensmt_del_context, "libdreal"), Void, (Ptr{Void},), ctx)
+
+opensmt_reset(ctx::opensmt_context) = 
+  ccall( (:opensmt_reset, "libdreal"), Void, (Ptr{Void},), ctx)
+
+opensmt_push(ctx::opensmt_context) = 
+  ccall( (:opensmt_push, "libdreal"), Void, (Ptr{Void},), ctx)
+
+opensmt_pop(ctx::opensmt_context) = 
+  ccall( (:opensmt_pop, "libdreal"), Void, (Ptr{Void},), ctx)
+
+opensmt_pop(ctx::opensmt_context) = 
+  ccall( (:opensmt_pop, "libdreal"), Void, (Ptr{Void},), ctx)
+
+opensmt_assert(ctx::opensmt_context, e::opensmt_expr) = 
+  ccall((:opensmt_assert, "libdreal"), Void,
+    (Ptr{Void}, Ptr{Void}), ctx, e)
+
+opensmt_check(ctx::opensmt_context) = 
+  ccall((:opensmt_check, "libdreal"), Cuint, (Ptr{Void},), ctx)
+
+opensmt_check_assump(ctx::opensmt_context, e::opensmt_expr) = 
+  ccall((:opensmt_check_assump, "libdreal"), Cuint, (Ptr{Void},Ptr{Void}), ctx, e)
+
+opensmt_check_lim_assump(ctx::opensmt_context, e::opensmt_expr, i::Cuint) = 
+  ccall((:opensmt_check_assump, "libdreal"), Cuint, (Ptr{Void},Ptr{Void}), ctx, e, i)
+
+opensmt_conflicts(ctx::opensmt_context) = 
+  ccall((:opensmt_conflicts, "libdreal"), Cuint, (Ptr{Void},), ctx)
+
+opensmt_decisions(ctx::opensmt_context) = 
+  ccall((:opensmt_decisions, "libdreal"), Cuint, (Ptr{Void},), ctx)
+
+opensmt_get_value(ctx::opensmt_context, e::opensmt_expr) = 
+  ccall((:opensmt_get_value, "libdreal"), Cuint, (Ptr{Void}, Ptr{Void}), ctx, e)
+
+opensmt_get_lb(ctx::opensmt_context, e::opensmt_expr) = 
+  ccall((:opensmt_get_lb, "libdreal"), Float64, (Ptr{Void}, Ptr{Void}), ctx, e)
+
+opensmt_get_ub(ctx::opensmt_context, e::opensmt_expr) = 
+  ccall((:opensmt_get_ub, "libdreal"), Float64, (Ptr{Void}, Ptr{Void}), ctx, e)
+
+opensmt_get_bool(ctx::opensmt_context, e::opensmt_expr) = 
+  ccall((:opensmt_get_bool, "libdreal"), Cuint, (Ptr{Void}, Ptr{Void}), ctx, e)
+
+opensmt_prefer(e::opensmt_expr) = 
+  ccall((:opensmt_prefer, "libdreal"), Cuint, (Ptr{Void}, Ptr{Void}), e)
+
+opensmt_polarity(ctx::opensmt_context, e::opensmt_expr, pos::Cint) = 
+  ccall((:opensmt_polarity, "libdreal"), Cuint, (Ptr{Void}, Ptr{Void}), ctx, e, pos)
+
+opensmt_print_model(ctx::opensmt_context, c::Ptr{UInt8}) = 
+  ccall((:opensmt_print_model, "libdreal"), Void, (Ptr{Void}, Ptr{UInt8}), ctx, c)
+
+opensmt_print_proof(ctx::opensmt_context, c::Ptr{UInt8}) = 
+  ccall((:opensmt_print_proof, "libdreal"), Void, (Ptr{Void}, Ptr{UInt8}), ctx, c)
+
+opensmt_print_interpolant(ctx::opensmt_context, c::Ptr{UInt8}) = 
+  ccall((:opensmt_print_interpolant, "libdreal"), Void, (Ptr{Void}, Ptr{UInt8}), ctx, c)
+
+## Formula Construction APIs
+## =========================
+
+opensmt_mk_true(ctx::opensmt_context) =
+  ccall((:opensmt_mk_true, "libdreal"), Ptr{Void}, (Ptr{Void},), ctx)
+
+opensmt_mk_false(ctx::opensmt_context) =
+  ccall((:opensmt_mk_false, "libdreal"), Ptr{Void}, (Ptr{Void},), ctx)
+
+opensmt_mk_bool_var(ctx::opensmt_context, varname::Ptr{UInt8}) =
+  ccall((:opensmt_mk_bool_var, "libdreal"), Ptr{Void}, (Ptr{Void}, Ptr{UInt8}), ctx, varname)
+
+opensmt_mk_bool_var(ctx,varname::ASCIIString) = opensmt_mk_bool_var(ctx, pointer(varname))
+
+opensmt_mk_real_var(ctx::opensmt_context, varname::Ptr{UInt8}, lb::Float64, ub::Float64) =
   ccall((:opensmt_mk_real_var, "libdreal"), Ptr{Void},
-        (Ptr{Void}, Ptr{UInt8}, Float64, Float64), ctx, pointer(varname), lb, ub)
+        (Ptr{Void}, Ptr{UInt8}, Float64, Float64), ctx, varname, lb, ub)
+
+opensmt_mk_real_var(ctx, varname::ASCIIString, lb, ub) =
+  opensmt_mk_real_var(ctx, pointer(varname), lb, ub)
+
+opensmt_mk_int_var(ctx::opensmt_context, varname::Ptr{UInt8}, lb::Cint, ub::Cint) =
+  ccall((:opensmt_mk_int_var, "libdreal"), Ptr{Void},
+        (Ptr{Void}, Ptr{UInt8}, Float64, Float64), ctx, varname, lb, ub)
+
+opensmt_mk_int_var(ctx, varname::ASCIIString, lb, ub) = opensmt_mk_int_var(ctx, varname, lb, ub)
+
+opensmt_mk_cost_var(ctx::opensmt_context, varname::Ptr{UInt8}) =
+  ccall((:opensmt_mk_cost_var, "libdreal"), Ptr{Void}, (Ptr{Void}, Ptr{UInt8}), ctx, varname)
+
+opensmt_mk_cost_var(ctx,varname::ASCIIString) = opensmt_mk_cost_var(ctx, pointer(varname))
+
+opensmt_mk_or(ctx::opensmt_context, es::Ptr{opensmt_expr}, i::Cuint) =
+  ccall((:opensmt_mk_or, "libdreal"), Ptr{Void},
+        (Ptr{Void}, Ptr{opensmt_expr}, Cuint), ctx, es, i)
+
+opensmt_mk_and(ctx::opensmt_context, es::Ptr{opensmt_expr}, i::Cuint) =
+  ccall((:opensmt_mk_and, "libdreal"), Ptr{Void},
+        (Ptr{Void}, Ptr{opensmt_expr}, Cuint), ctx, es, i)
 
 opensmt_mk_eq(ctx::opensmt_context, e1::opensmt_expr, e2::opensmt_expr) =
   ccall((:opensmt_mk_eq, "libdreal"), Ptr{Void},
         (Ptr{Void}, Ptr{Void}, Ptr{Void}), ctx, e1, e2)
 
-@doc "( opensmt_context, opensmt_expr ) -> void" ->
-opensmt_assert(ctx::opensmt_context, e::opensmt_expr) = 
-  ccall((:opensmt_assert, "libdreal"), Void,
-    (Ptr{Void}, Ptr{Void}), ctx, e)
+opensmt_mk_ite(ctx::opensmt_context, e1::opensmt_expr, e2::opensmt_expr, e3::opensmt_expr) =
+  ccall((:opensmt_mk_ite, "libdreal"), Ptr{Void},
+        (Ptr{Void}, Ptr{Void}, Ptr{Void}, Ptr{Void}), ctx, e1, e2, e3)
 
-@doc "(( opensmt_context, opensmt_expr);) -> opensmt_expr" ->
+opensmt_mk_not(ctx::opensmt_context, e::opensmt_expr) =
+  ccall((:opensmt_mk_not, "libdreal"), Ptr{Void},
+        (Ptr{Void}, Ptr{Void}), ctx, e)
+
+opensmt_mk_num_from_string(ctx::opensmt_context, c::Ptr{UInt8}) =
+  ccall((:opensmt_mk_num_from_string, "libdreal"), Ptr{Void},
+        (Ptr{Void}, Ptr{UInt8}), ctx, c)
+
+opensmt_mk_plus(ctx::opensmt_context, es::Ptr{opensmt_expr}, i::Cuint) =
+  ccall((:opensmt_mk_plus, "libdreal"), Ptr{Void},
+        (Ptr{Void}, Ptr{opensmt_expr}, Cuint), ctx, es, i)
+
+opensmt_mk_minus(ctx::opensmt_context, e1::opensmt_expr, e2::opensmt_expr) =
+  ccall((:opensmt_mk_minus, "libdreal"), Ptr{Void},
+        (Ptr{Void}, Ptr{Void}, Ptr{Void}), ctx, e1, e2)
+
+opensmt_mk_times(ctx::opensmt_context, es::Ptr{opensmt_expr}, i::Cuint) =
+  ccall((:opensmt_mk_times, "libdreal"), Ptr{Void},
+        (Ptr{Void}, Ptr{opensmt_expr}, Cuint), ctx, es, i)
+
+opensmt_mk_lt(ctx::opensmt_context, e1::opensmt_expr, e2::opensmt_expr) =
+  ccall((:opensmt_mk_lt, "libdreal"), Ptr{Void},
+        (Ptr{Void}, Ptr{Void}, Ptr{Void}), ctx, e1, e2)
+
+opensmt_mk_leq(ctx::opensmt_context, e1::opensmt_expr, e2::opensmt_expr) =
+  ccall((:opensmt_mk_leq, "libdreal"), Ptr{Void},
+        (Ptr{Void}, Ptr{Void}, Ptr{Void}), ctx, e1, e2)
+
+opensmt_mk_gt(ctx::opensmt_context, e1::opensmt_expr, e2::opensmt_expr) =
+  ccall((:opensmt_mk_gt, "libdreal"), Ptr{Void},
+        (Ptr{Void}, Ptr{Void}, Ptr{Void}), ctx, e1, e2)
+
+opensmt_mk_geq(ctx::opensmt_context, e1::opensmt_expr, e2::opensmt_expr) =
+  ccall((:opensmt_mk_geq, "libdreal"), Ptr{Void},
+        (Ptr{Void}, Ptr{Void}, Ptr{Void}), ctx, e1, e2)
+
+opensmt_mk_abs(ctx::opensmt_context, e::opensmt_expr) = 
+  ccall((:opensmt_mk_abs, "libdreal"), Ptr{Void}, (Ptr{Void}, Ptr{Void}), ctx, e)
+
+opensmt_mk_exp(ctx::opensmt_context, e::opensmt_expr) = 
+  ccall((:opensmt_mk_exp, "libdreal"), Ptr{Void}, (Ptr{Void}, Ptr{Void}), ctx, e)
+
+opensmt_mk_log(ctx::opensmt_context, e::opensmt_expr) = 
+  ccall((:opensmt_mk_log, "libdreal"), Ptr{Void}, (Ptr{Void}, Ptr{Void}), ctx, e)
+
+opensmt_mk_pow(ctx::opensmt_context, e::opensmt_expr) = 
+  ccall((:opensmt_mk_pow, "libdreal"), Ptr{Void}, (Ptr{Void}, Ptr{Void}), ctx, e)
+
 opensmt_mk_sin(ctx::opensmt_context, e::opensmt_expr) = 
   ccall((:opensmt_mk_sin, "libdreal"), Ptr{Void}, (Ptr{Void}, Ptr{Void}), ctx, e)
 
-@doc "(( opensmt_context, opensmt_expr);) -> opensmt_expr" ->
 opensmt_mk_cos(ctx::opensmt_context, e::opensmt_expr) = 
   ccall((:opensmt_mk_cos, "libdreal"), Ptr{Void}, (Ptr{Void}, Ptr{Void}), ctx, e)
 
-opensmt_check(ctx::opensmt_context) = 
-  ccall((:opensmt_check, "libdreal"), Cuint, (Ptr{Void},), ctx)
+opensmt_mk_tan(ctx::opensmt_context, e::opensmt_expr) = 
+  ccall((:opensmt_mk_tan, "libdreal"), Ptr{Void}, (Ptr{Void}, Ptr{Void}), ctx, e)
 
-## Medium Level API
-## +===============
+opensmt_mk_asin(ctx::opensmt_context, e::opensmt_expr) = 
+  ccall((:opensmt_mk_asin, "libdreal"), Ptr{Void}, (Ptr{Void}, Ptr{Void}), ctx, e)
 
-if VERSION >= v"0.4.0-dev"
-  RTLD_LAZY =  Libdl.RTLD_LAZY
-  RTLD_DEEPBIND = Libdl.RTLD_DEEPBIND
-  RTLD_GLOBAL = Libdl.RTLD_GLOBAL
-  compat_dlopen = Libdl.dlopen
-else
-  compat_dlopen = dlopen
-end
+opensmt_mk_acos(ctx::opensmt_context, e::opensmt_expr) = 
+  ccall((:opensmt_mk_acos, "libdreal"), Ptr{Void}, (Ptr{Void}, Ptr{Void}), ctx, e)
 
-# function dlopen_shared_deps!()
-compat_dlopen("libprim.so", RTLD_LAZY|RTLD_DEEPBIND|RTLD_GLOBAL)
-compat_dlopen("libClp.so", RTLD_LAZY|RTLD_DEEPBIND|RTLD_GLOBAL)
-compat_dlopen("libibex.so", RTLD_LAZY|RTLD_DEEPBIND|RTLD_GLOBAL)
-compat_dlopen("libgflags.so", RTLD_LAZY|RTLD_DEEPBIND|RTLD_GLOBAL)
-compat_dlopen("libglog.so", RTLD_LAZY|RTLD_DEEPBIND|RTLD_GLOBAL)
-compat_dlopen("libcapd.so", RTLD_LAZY|RTLD_DEEPBIND|RTLD_GLOBAL)
-# end
+opensmt_mk_atan(ctx::opensmt_context, e::opensmt_expr) = 
+  ccall((:opensmt_mk_atan, "libdreal"), Ptr{Void}, (Ptr{Void}, Ptr{Void}), ctx, e)
 
-function init_dreal!()
-  global is_dreal_initialised
-  is_dreal_initialised == true && return
-  # dlopen_shared_deps!()
-  opensmt_init()
-  is_dreal_initialised = true
-end
+opensmt_mk_sinh(ctx::opensmt_context, e::opensmt_expr) = 
+  ccall((:opensmt_mk_sinh, "libdreal"), Ptr{Void}, (Ptr{Void}, Ptr{Void}), ctx, e)
 
-set_logic!(l::logic) = opensmt_mk_context(Cuint(l.val))
+opensmt_mk_cosh(ctx::opensmt_context, e::opensmt_expr) = 
+  ccall((:opensmt_mk_cosh, "libdreal"), Ptr{Void}, (Ptr{Void}, Ptr{Void}), ctx, e)
 
-# ## Example
-# ## =======
-init_dreal!()
-ctx = set_logic!(qf_nra)
-x = opensmt_mk_real_var( ctx, "x" , -3.141592, 3.141592)
-y = opensmt_mk_real_var( ctx, "y" , -3.141592, 3.141592)
-eq = opensmt_mk_eq( ctx, opensmt_mk_sin(ctx, x), opensmt_mk_cos(ctx, y));
-opensmt_assert( ctx, eq );
-res = opensmt_check( ctx );
-println("res is", res)
+opensmt_mk_tanh(ctx::opensmt_context, e::opensmt_expr) = 
+  ccall((:opensmt_mk_tanh, "libdreal"), Ptr{Void}, (Ptr{Void}, Ptr{Void}), ctx, e)
+
+opensmt_mk_atan2(ctx::opensmt_context, e::opensmt_expr) = 
+  ccall((:opensmt_mk_atan2, "libdreal"), Ptr{Void}, (Ptr{Void}, Ptr{Void}), ctx, e)
