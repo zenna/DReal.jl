@@ -1,5 +1,6 @@
 module dReal
 
+using AbstractDomains
 
 if VERSION >= v"0.4.0-dev"
   RTLD_LAZY =  Libdl.RTLD_LAZY
@@ -21,13 +22,25 @@ catch
   error("Could not load required shared libraries")
 end
 
-export
-  init_dreal!,
-  set_logic!,
-  logic
+import Base: cos, sin, (==)
+# export
+#   init_dreal!,
+#   set_precision!
+#   init_dreal!,
+#   logic,
+#   Var,
+#   add!,
+#   check
 
 include("wrap_capi.jl")
-include("medium.jl")
+include("logic.jl")
+include("context.jl")
+include("environment.jl")
+include("expression.jl")
+include("construct.jl")
+
+# export
+#   Context,
 
 export
   qf_uf,         # Uninterpreted Functions
@@ -42,6 +55,4 @@ export
   qf_uflra,      # UF + LRA
   qf_bool,       # Only booleans
   qf_ct        # Cost
-
-
 end

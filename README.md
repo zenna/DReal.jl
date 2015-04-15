@@ -12,4 +12,4 @@ dReal.jl is not yet in the official Julia Package repository.  You can still eas
 
 ```julia
 Pkg.clone("https://github.com/zenna/dReal.jl.git")
-```
+``` 

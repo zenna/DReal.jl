@@ -3,14 +3,12 @@ typealias opensmt_context Ptr{Void}
 
 ## Communication APIs
 ## =========================
-@doc "Initialise opensmt.  This (presumably?) must be called before anything else" ->
 opensmt_init() = ccall( (:opensmt_init, "libdreal"), Void, ())
 
 @doc "Set Verboisty of dReal output" ->
-opensmt_set_verbosity(ctx::opensmt_context, level::Int) =
+opensmt_set_verbosity(ctx::opensmt_context, level::Cint) =
   ccall((:opensmt_set_verbosity, "libdreal"), Void, (Ptr{Void}, Cint), ctx, level)
 
-@doc "(opensmt_context c, const double p)" ->
 opensmt_set_precision(ctx::opensmt_context, p::Float64) = 
   ccall( (:opensmt_set_precision, "libdreal"), Ptr{Void}, (Ptr{Void}, Float64), ctx, p)
 
