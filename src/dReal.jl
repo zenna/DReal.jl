@@ -1,6 +1,7 @@
 module dReal
 
 using AbstractDomains
+using Compat
 
 if VERSION >= v"0.4.0-dev"
   RTLD_LAZY =  Libdl.RTLD_LAZY
@@ -22,15 +23,22 @@ catch
   error("Could not load required shared libraries")
 end
 
+compat_dlopen("libdreal.so", RTLD_LAZY|RTLD_DEEPBIND|RTLD_GLOBAL)
+
+
 import Base: cos, sin, (==)
-# export
-#   init_dreal!,
-#   set_precision!
-#   init_dreal!,
-#   logic,
-#   Var,
-#   add!,
-#   check
+export
+  Context,
+  logic,
+  init_dreal!,
+  set_precision!,
+  init_dreal!,
+  Var,
+  add!,
+  is_satisfiable,
+  global_context,
+  set_verbosity_level!,
+  push_ctx!
 
 include("wrap_capi.jl")
 include("logic.jl")
@@ -55,4 +63,6 @@ export
   qf_uflra,      # UF + LRA
   qf_bool,       # Only booleans
   qf_ct        # Cost
+
+init_dreal!()
 end
