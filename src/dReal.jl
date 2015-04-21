@@ -38,7 +38,10 @@ export
   is_satisfiable,
   global_context,
   set_verbosity_level!,
-  push_ctx!
+  push_ctx!,
+  pop_ctx!,
+  reset_ctx!,
+  delete_ctx!
 
 include("wrap_capi.jl")
 include("logic.jl")

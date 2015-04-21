@@ -5,14 +5,12 @@ typealias opensmt_context Ptr{Void}
 ## =========================
 opensmt_init() = ccall( (:opensmt_init, "libdreal"), Void, ())
 
-@doc "Set Verboisty of dReal output" ->
 opensmt_set_verbosity(ctx::opensmt_context, level::Cint) =
   ccall((:opensmt_set_verbosity, "libdreal"), Void, (Ptr{Void}, Cint), ctx, level)
 
 opensmt_set_precision(ctx::opensmt_context, p::Float64) = 
   ccall( (:opensmt_set_precision, "libdreal"), Ptr{Void}, (Ptr{Void}, Float64), ctx, p)
 
-@doc "(opensmt_context c, const double p)" ->
 opensmt_get_precision(ctx::opensmt_context, p::Float64) = 
   ccall( (:opensmt_get_precision, "libdreal"), Ptr{Void}, (Ptr{Void}, Float64), ctx, p)
 
@@ -103,9 +101,6 @@ opensmt_mk_bool_var(ctx,varname::ASCIIString) = opensmt_mk_bool_var(ctx, pointer
 opensmt_mk_real_var(ctx::opensmt_context, varname::ASCIIString, lb::Float64, ub::Float64) =
   ccall((:opensmt_mk_real_var, "libdreal"), Ptr{Void},
         (Ptr{Void}, Ptr{UInt8}, Float64, Float64), ctx, varname, lb, ub)
-
-# opensmt_mk_real_var(ctx, varname::ASCIIString, lb, ub) =
-#   opensmt_mk_real_var(ctx, pointer(varname), lb, ub)
 
 opensmt_mk_int_var(ctx::opensmt_context, varname::ASCIIString, lb::Cint, ub::Cint) =
   ccall((:opensmt_mk_int_var, "libdreal"), Ptr{Void},

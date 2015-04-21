@@ -86,12 +86,24 @@ end
 # Trig
 cos{T<:Real}(ctx::Context, x::Ex{T}) = Ex{T}(opensmt_mk_cos(ctx.ctx, x.e))
 sin{T<:Real}(ctx::Context, x::Ex{T}) = Ex{T}(opensmt_mk_sin(ctx.ctx, x.e))
+cos{T<:Real}(x::Ex{T}) = cos(global_context(),x)
+sin{T<:Real}(x::Ex{T}) = sin(global_context(),x)
 
 ## Queries
 ## =======
 @doc "Is predicate Y satisfiable?" ->
 # is_satisfiable(ctx::Context) = [false,"UNKNOWN",true][opensmt_check(ctx.ctx)+2]
-is_satisfiable(ctx::Context) = opensmt_check(ctx.ctx)
+function is_satisfiable(ctx::Context)
+  sat = opensmt_check(ctx.ctx)
+  if sat == 1
+    return true
+  elseif sat == -1
+    return false
+  else 
+    error("Could not determine satisfiability, dReal returned $sat")
+  end
+end
+
 is_satisfiable() = is_satisfiable(global_context())
 
 @doc "Return a model from the solver"
@@ -114,3 +126,12 @@ add!(e::Ex{Bool}) = add!(global_context(), e)
 
 push_ctx!(ctx::Context) = opensmt_push(ctx.ctx)
 push_ctx!() = push_ctx!(global_context())
+
+pop_ctx!(ctx::Context) = opensmt_pop(ctx.ctx)
+pop_ctx!() = pop_ctx!(global_context())
+
+reset_ctx!(ctx::Context) = opensmt_reset(ctx.ctx)
+reset_ctx!() = reset_ctx!(global_context())
+
+delete_ctx!(ctx::Context) = opensmt_del_context(ctx.ctx)
+delete_ctx!() = delete_ctx!(global_context())
