@@ -47,7 +47,9 @@ This example also shows how to extract a *model*. A model is an assignment of  v
 
 The feature which distinguishes dReal in comparison to other SMT solvers is its powerful support for nonlinear real arithmetic.
 
-Consider an example which slighly modifies a formula from the Flyspeck project benchmarks, taken from (the dReal homepage)[http://dreal.github.io/]
+Consider an example which slighly modifies a formula from the Flyspeck project benchmarks, taken from [the dReal homepage](http://dreal.github.io/)
+
+![flyspeckimage]!(images/eq.png?raw=true)
 
 ∃[3.0,3.14]x1.∃[−7.0,5.0]x2.2×3.14159265−2x1arcsin(cos0.797×sin(3.14159265x1))≤−0.591−0.0331x2+0.506+1.0
 
