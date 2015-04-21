@@ -1,7 +1,8 @@
 tests = ["ex1capi",
          "ex1",
          "ex2capi",
-         "ex2"]
+         "ex2"
+         "exintfloat"]
 
 println("Running tests:")
 

@@ -26,10 +26,11 @@ end
 compat_dlopen("libdreal.so", RTLD_LAZY|RTLD_DEEPBIND|RTLD_GLOBAL)
 
 
-import Base: cos, sin, (==)
+import Base: cos, sin, (==), print, show
 export
   Context,
   logic,
+  model,
   init_dreal!,
   set_precision!,
   init_dreal!,

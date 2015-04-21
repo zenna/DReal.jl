@@ -14,3 +14,7 @@ Var(ctx::Context,T::Type{Bool}, name::ASCIIString) =
 # Global Context
 Var(T, name::ASCIIString, lb, ub) = Var(global_context(), T, name, lb, ub)
 Var(T, name::ASCIIString) = Var(global_context(), T, name)
+
+## Printing
+## ========
+print(io::IO, e::Ex) = opensmt_print_expr(e.e)

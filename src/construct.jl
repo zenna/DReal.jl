@@ -3,7 +3,9 @@
 
 # TODO
 # Make this lifting more compact
-
+# Interop between Expressions of different types, e.g. Int and Float
+# Multiplication division other vaarg functions
+# Remaining trigonometric functions
 
 ## Conversion
 ## ==========
@@ -19,19 +21,32 @@ boolop2opensmt = @compat Dict(:(=>) => opensmt_mk_geq, :(>) => opensmt_mk_gt,
                               :(<=) => opensmt_mk_leq, :(<) => opensmt_mk_lt,
                               :(==) => opensmt_mk_eq)
 
+## Real × Real -> Bool
 for (op,opensmt_func) in boolop2opensmt
-  @eval ($op){T<:Real}(ctx::Context, x::Ex{T}, y::Ex{T}) = Ex{Bool}($opensmt_func(ctx.ctx,x.e,y.e))
+  @eval ($op){T1<:Real, T2<:Real}(ctx::Context, x::Ex{T1}, y::Ex{T2}) = 
+    Ex{Bool}($opensmt_func(ctx.ctx,x.e,y.e))
   # Var and constant c
-  @eval ($op){T<:Real}(ctx::Context, x::Ex{T}, c::T) = Ex{Bool}($opensmt_func(ctx.ctx,x.e,convert(Ex{T},c)))
-  @eval ($op){T<:Real}(ctx::Context, c::T, y::Ex{T}) = Ex{Bool}($opensmt_func(ctx.ctx,convert(Ex{T},c),x.e))
+  @eval ($op){T1<:Real, T2<:Real}(ctx::Context, x::Ex{T1}, c::T2) = 
+    Ex{Bool}($opensmt_func(ctx.ctx,x.e,convert(Ex{promote_type(T1,T2)},c)))
+
+  # constant c and Var
+  @eval ($op){T1<:Real, T2<:Real}(ctx::Context, c::T1, x::Ex{T2}) = 
+    Ex{Bool}($opensmt_func(ctx.ctx,convert(Ex{promote_type(T1,T2)},c),x.e))
   
   # Default Contex
-  @eval ($op){T<:Real}(x::Ex{T},y::Ex{T}) = ($op)(global_context(), x, y)
-  @eval ($op){T<:Real}(c::T,x::Ex{T}) = ($op)(global_context(), c, x)
-  @eval ($op){T<:Real}(x::Ex{T},c::T) = ($op)(global_context(), x, c)
+  @eval ($op){T1<:Real, T2<:Real}(x::Ex{T1}, y::Ex{T2}) = ($op)(global_context(), x, y)
+  @eval ($op){T1<:Real, T2<:Real}(x::Ex{T1}, c::T2) = ($op)(global_context(), x, c)
+  @eval ($op){T1<:Real, T2<:Real}(c::T1, x::Ex{T2}) = ($op)(global_context(), c, x)
 end
 
-# (-)
+# Binary Real valued functions
+unaryrealop2opensmt = @compat Dict(
+  :abs => opensmt_mk_abs, :exp => opensmt_mk_exp, :log => opensmt_mk_log,
+  :pow => opensmt_mk_pow, :sin => opensmt_mk_sin, :cos => opensmt_mk_cos,
+  :tan => opensmt_mk_tan, :asin => opensmt_mk_asin, :acos => opensmt_mk_acos,
+  :atan => opensmt_mk_pow, :sinh => opensmt_mk_sinh, :cosh => opensmt_mk_cosh,
+  :tanh => opensmt_mk_tanh, :atan2 => opensmt_mk_atan2)
+
 (-){T<:Real}(ctx::Context, x::Ex{T}, y::Ex{T}) = Ex{T}(opensmt_mk_minus(ctx.ctx,x.e,y.e))
 (-){T<:Real}(ctx::Context, x::Ex{T}, c::T) = Ex{T}(opensmt_mk_minus(ctx.ctx,x.e,convert(Ex{T},c)))
 (-){T<:Real}(ctx::Context, c::T, y::Ex{T}) = Ex{T}(opensmt_mk_minus(ctx.ctx,convert(Ex{T},c),x.e))
@@ -39,55 +54,31 @@ end
 (-){T<:Real}(c::T,x::Ex{T}) = (-)(global_context(), c, x)
 (-){T<:Real}(x::Ex{T},c::T) = (-)(global_context(), x, c)
 
-
-## Real × Real -> Bool
-# (>)
-(>){T<:Real}(ctx::Context, x::Ex{T}, y::Ex{T}) = Ex{Bool}(opensmt_mk_gt(ctx.ctx,x.e,y.e))
-(>){T<:Real}(ctx::Context, x::Ex{T}, c::T) = Ex{Bool}(opensmt_mk_gt(ctx.ctx,x.e,convert(Ex{T},c)))
-(>){T<:Real}(ctx::Context, c::T, y::Ex{T}) = Ex{Bool}(opensmt_mk_gt(ctx.ctx,convert(Ex{T},c),x.e))
-(>){T<:Real}(x::Ex{T},y::Ex{T}) = (>)(global_context(), x, y)
-(>){T<:Real}(c::T,x::Ex{T}) = (>)(global_context(), c, x)
-(>){T<:Real}(x::Ex{T},c::T) = (>)(global_context(), x, c)
+# function (+)(ctx::Context, x::Ex{Real}...)
+#   T = promote_type([typeof(a) for a in x]...)
+#   Ex{T}(opensmt_mk_plus(ctx.ctx, )
 
 
-# (>=)
-(>=){T<:Real}(ctx::Context, x::Ex{T}, y::Ex{T}) = Ex{Bool}(opensmt_mk_geq(ctx.ctx,x.e,y.e))
-(>=){T<:Real}(ctx::Context, x::Ex{T}, c::T) = Ex{Bool}(opensmt_mk_geq(ctx.ctx,x.e,convert(Ex{T},c)))
-(>=){T<:Real}(ctx::Context, c::T, y::Ex{T}) = Ex{Bool}(opensmt_mk_geq(ctx.ctx,convert(Ex{T},c),x.e))
-(>=){T<:Real}(x::Ex{T},y::Ex{T}) = (>=)(global_context(), x, y)
-(>=){T<:Real}(c::T,x::Ex{T}) = (>=)(global_context(), c, x)
-(>=){T<:Real}(x::Ex{T},c::T) = (>=)(global_context(), x, c)
+# (+){T<:Real}(ctx::Context, x::Ex{T}, y::Ex{T}) = Ex{T}(opensmt_mk_minus(ctx.ctx,x.e,y.e))
 
-# (<)
-(<){T<:Real}(ctx::Context, x::Ex{T}, y::Ex{T}) = Ex{Bool}(opensmt_mk_lt(ctx.ctx,x.e,y.e))
-(<){T<:Real}(ctx::Context, x::Ex{T}, c::T) = Ex{Bool}(opensmt_mk_lt(ctx.ctx,x.e,convert(Ex{T},c)))
-(<){T<:Real}(ctx::Context, c::T, y::Ex{T}) = Ex{Bool}(opensmt_mk_lt(ctx.ctx,convert(Ex{T},c),x.e))
-(<){T<:Real}(x::Ex{T},y::Ex{T}) = (<)(global_context(), x, y)
-(<){T<:Real}(c::T,x::Ex{T}) = (<)(global_context(), c, x)
-(<){T<:Real}(x::Ex{T},c::T) = (<)(global_context(), x, c)
+# ctx::opensmt_context, es::Ptr{opensmt_expr}, i::Cuint) 
 
-# (<=)
-(<=){T<:Real}(ctx::Context, x::Ex{T}, y::Ex{T}) = Ex{Bool}(opensmt_mk_leq(ctx.ctx,x.e,y.e))
-(<=){T<:Real}(ctx::Context, x::Ex{T}, c::T) = Ex{Bool}(opensmt_mk_leq(ctx.ctx,x.e,convert(Ex{T},c)))
-(<=){T<:Real}(ctx::Context, c::T, y::Ex{T}) = Ex{Bool}(opensmt_mk_leq(ctx.ctx,convert(Ex{T},c),x.e))
-(<=){T<:Real}(x::Ex{T},y::Ex{T}) = (<=)(global_context(), x, y)
-(<=){T<:Real}(c::T,x::Ex{T}) = (<=)(global_context(), c, x)
-(<=){T<:Real}(x::Ex{T},c::T) = (<=)(global_context(), x, c)
+# Unary Real valued functions
+unaryrealop2opensmt = @compat Dict(
+  :abs => opensmt_mk_abs, :exp => opensmt_mk_exp, :log => opensmt_mk_log,
+  :pow => opensmt_mk_pow, :sin => opensmt_mk_sin, :cos => opensmt_mk_cos,
+  :tan => opensmt_mk_tan, :asin => opensmt_mk_asin, :acos => opensmt_mk_acos,
+  :atan => opensmt_mk_pow, :sinh => opensmt_mk_sinh, :cosh => opensmt_mk_cosh,
+  :tanh => opensmt_mk_tanh, :atan2 => opensmt_mk_atan2)
 
+for (op,opensmt_func) in unaryrealop2opensmt
+  @eval ($op){T<:Real}(ctx::Context, x::Ex{T}) = Ex{Float64}($opensmt_func(ctx.ctx,x.e))
+  @eval ($op){T<:Real}(x::Ex{T}) = ($op)(global_context(),x)
+end
 
-# (==)
-(==){T<:Real}(ctx::Context, x::Ex{T}, y::Ex{T}) = Ex{Bool}(opensmt_mk_eq(ctx.ctx,x.e,y.e))
-(==){T<:Real}(ctx::Context, x::Ex{T}, c::T) = Ex{Bool}(opensmt_mk_eq(ctx.ctx,x.e,convert(Ex{T},c)))
-(==){T<:Real}(ctx::Context, c::T, y::Ex{T}) = Ex{Bool}(opensmt_mk_eq(ctx.ctx,convert(Ex{T},c),x.e))
-(==){T<:Real}(x::Ex{T},y::Ex{T}) = (==)(global_context(), x, y)
-(==){T<:Real}(c::T,x::Ex{T}) = (==)(global_context(), c, x)
-(==){T<:Real}(x::Ex{T},c::T) = (==)(global_context(), x, c)
-
-# Trig
-cos{T<:Real}(ctx::Context, x::Ex{T}) = Ex{T}(opensmt_mk_cos(ctx.ctx, x.e))
-sin{T<:Real}(ctx::Context, x::Ex{T}) = Ex{T}(opensmt_mk_sin(ctx.ctx, x.e))
-cos{T<:Real}(x::Ex{T}) = cos(global_context(),x)
-sin{T<:Real}(x::Ex{T}) = sin(global_context(),x)
+#TODO
+# ITE
+# AND OR
 
 ## Queries
 ## =======
@@ -116,6 +107,11 @@ end
 function model(ctx::Context, e::Ex{Bool})
   #TODO, check dirty
   opensmt_get_bool(ctx.ctx, e.e)
+end
+
+function model(ctx::Context, e::Ex{Int})
+  #TODO, check dirty
+  opensmt_get_value(ctx.ctx, e.e)
 end
 
 model{T}(e::Ex{T}) = model(global_context(),e)
