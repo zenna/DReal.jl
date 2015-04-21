@@ -42,7 +42,11 @@ export
   push_ctx!,
   pop_ctx!,
   reset_ctx!,
-  delete_ctx!
+  delete_ctx!,
+  reset_global_ctx!,
+  →,
+  implies
+
 
 include("wrap_capi.jl")
 include("logic.jl")

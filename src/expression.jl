@@ -3,6 +3,9 @@ immutable Ex{T}
   e::Ptr{Void}
 end
 
+## TODO
+## Check that lb <= ub
+
 @doc "Create a variable" ->
 Var(ctx::Context, T::Type{Float64}, name::ASCIIString, lb::Float64, ub::Float64) =
   Ex{T}(opensmt_mk_real_var(ctx.ctx, name, lb, ub))

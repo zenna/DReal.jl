@@ -5,5 +5,7 @@ immutable Context
 end
 
 Context(l::logic) = Context(opensmt_mk_context(Cuint(l.val)))
-default_global_context = Context(qf_nra)
-global_context() = (global global_context; default_global_context)
+create_global_ctx!(logic::logic = qf_nra) = 
+  (global default_global_context; default_global_context = Context(qf_nra))
+create_global_ctx!()
+global_context() = (global default_global_context; default_global_context)

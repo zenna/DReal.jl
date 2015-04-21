@@ -58,7 +58,7 @@ opensmt_decisions(ctx::opensmt_context) =
   ccall((:opensmt_decisions, "libdreal"), Cuint, (Ptr{Void},), ctx)
 
 opensmt_get_value(ctx::opensmt_context, e::opensmt_expr) = 
-  ccall((:opensmt_get_value, "libdreal"), Cuint, (Ptr{Void}, Ptr{Void}), ctx, e)
+  ccall((:opensmt_get_value, "libdreal"), Ptr{Void}, (Ptr{Void}, Ptr{Void}), ctx, e)
 
 opensmt_get_lb(ctx::opensmt_context, e::opensmt_expr) = 
   ccall((:opensmt_get_lb, "libdreal"), Float64, (Ptr{Void}, Ptr{Void}), ctx, e)
@@ -114,11 +114,11 @@ opensmt_mk_cost_var(ctx::opensmt_context, varname::Ptr{UInt8}) =
 
 opensmt_mk_cost_var(ctx,varname::ASCIIString) = opensmt_mk_cost_var(ctx, pointer(varname))
 
-opensmt_mk_or(ctx::opensmt_context, es::Ptr{opensmt_expr}, i::Cuint) =
+opensmt_mk_or(ctx::opensmt_context, es::Vector{opensmt_expr}, i::Cuint) =
   ccall((:opensmt_mk_or, "libdreal"), Ptr{Void},
         (Ptr{Void}, Ptr{opensmt_expr}, Cuint), ctx, es, i)
 
-opensmt_mk_and(ctx::opensmt_context, es::Ptr{opensmt_expr}, i::Cuint) =
+opensmt_mk_and(ctx::opensmt_context, es::Vector{opensmt_expr}, i::Cuint) =
   ccall((:opensmt_mk_and, "libdreal"), Ptr{Void},
         (Ptr{Void}, Ptr{opensmt_expr}, Cuint), ctx, es, i)
 
@@ -138,7 +138,7 @@ opensmt_mk_num_from_string(ctx::opensmt_context, c::ASCIIString) =
   ccall((:opensmt_mk_num_from_string, "libdreal"), Ptr{Void},
         (Ptr{Void}, Ptr{UInt8}), ctx, c)
 
-opensmt_mk_plus(ctx::opensmt_context, es::Ptr{opensmt_expr}, i::Cuint) =
+opensmt_mk_plus(ctx::opensmt_context, es::Vector{opensmt_expr}, i::Cuint) =
   ccall((:opensmt_mk_plus, "libdreal"), Ptr{Void},
         (Ptr{Void}, Ptr{opensmt_expr}, Cuint), ctx, es, i)
 
@@ -146,7 +146,7 @@ opensmt_mk_minus(ctx::opensmt_context, e1::opensmt_expr, e2::opensmt_expr) =
   ccall((:opensmt_mk_minus, "libdreal"), Ptr{Void},
         (Ptr{Void}, Ptr{Void}, Ptr{Void}), ctx, e1, e2)
 
-opensmt_mk_times(ctx::opensmt_context, es::Ptr{opensmt_expr}, i::Cuint) =
+opensmt_mk_times(ctx::opensmt_context, es::Vector{opensmt_expr}, i::Cuint) =
   ccall((:opensmt_mk_times, "libdreal"), Ptr{Void},
         (Ptr{Void}, Ptr{opensmt_expr}, Cuint), ctx, es, i)
 

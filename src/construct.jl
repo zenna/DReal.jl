@@ -1,18 +1,21 @@
 ## For Contructing and Querying Models
 ## ===================================
 
-# TODO
-# Make this lifting more compact
-# Interop between Expressions of different types, e.g. Int and Float
-# Multiplication division other vaarg functions
-# Remaining trigonometric functions
-
 ## Conversion
 ## ==========
 import Base: convert, push!
 
-convert{T<:Real}(::Type{Ex{T}}, ctx::Context, x::T) = opensmt_mk_num_from_string(ctx.ctx, string(x))
-convert{T<:Real}(t::Type{Ex{T}}, x::T) = convert(t,global_context(),x)
+convert{T1<:Real, T2<:Real}(::Type{Ex{T1}}, ctx::Context, x::T2) =
+  opensmt_mk_num_from_string(ctx.ctx, string(convert(T1,x)))
+convert{T<:Real}(::Type{Ex{T}},x::Ex{T}) = x # This seems redundant!
+convert{T1<:Real, T2<:Real}(t::Type{Ex{T1}}, x::T2) = convert(t,global_context(),x)
+
+# Bool expressions
+convert(::Type{Ex{Bool}}, ctx::Context, x::Bool) =
+  if x opensmt_mk_true(ctx.ctx) else opensmt_mk_false(ctx.ctx) end
+
+convert(::Type{Ex{Bool}}, x::Bool) =
+  convert(Ex{Bool}, global_context(), x)
 
 ## Arithmetic
 ## ==========
@@ -47,21 +50,49 @@ unaryrealop2opensmt = @compat Dict(
   :atan => opensmt_mk_pow, :sinh => opensmt_mk_sinh, :cosh => opensmt_mk_cosh,
   :tanh => opensmt_mk_tanh, :atan2 => opensmt_mk_atan2)
 
-(-){T<:Real}(ctx::Context, x::Ex{T}, y::Ex{T}) = Ex{T}(opensmt_mk_minus(ctx.ctx,x.e,y.e))
-(-){T<:Real}(ctx::Context, x::Ex{T}, c::T) = Ex{T}(opensmt_mk_minus(ctx.ctx,x.e,convert(Ex{T},c)))
-(-){T<:Real}(ctx::Context, c::T, y::Ex{T}) = Ex{T}(opensmt_mk_minus(ctx.ctx,convert(Ex{T},c),x.e))
-(-){T<:Real}(x::Ex{T},y::Ex{T}) = (-)(global_context(), x, y)
-(-){T<:Real}(c::T,x::Ex{T}) = (-)(global_context(), c, x)
-(-){T<:Real}(x::Ex{T},c::T) = (-)(global_context(), x, c)
 
-# function (+)(ctx::Context, x::Ex{Real}...)
-#   T = promote_type([typeof(a) for a in x]...)
-#   Ex{T}(opensmt_mk_plus(ctx.ctx, )
+for (op, opensmt_func) in @compat Dict(:(-) => opensmt_mk_minus) #, :(/) => opensmt_mk_divide)
+  @eval ($op){T1<:Real, T2<:Real}(ctx::Context, x::Ex{T1}, y::Ex{T2}) =
+    Ex{promote_type(T1,T2)}($opensmt_func(ctx.ctx,x.e,y.e))
 
+  # Var and constant c
+  @eval ($op){T1<:Real, T2<:Real}(ctx::Context, x::Ex{T1}, c::T2) =
+    Ex{promote_type(T1,T2)}($opensmt_func(ctx.ctx,x.e,convert(Ex{promote_type(T1,T2)},c)))
 
-# (+){T<:Real}(ctx::Context, x::Ex{T}, y::Ex{T}) = Ex{T}(opensmt_mk_minus(ctx.ctx,x.e,y.e))
+  # constant c and Var
+  @eval ($op){T1<:Real, T2<:Real}(ctx::Context, c::T2, x::Ex{T1}) =
+    Ex{promote_type(T1,T2)}($opensmt_func(ctx.ctx,convert(Ex{promote_type(T1,T2)},c), x.e))
 
-# ctx::opensmt_context, es::Ptr{opensmt_expr}, i::Cuint) 
+  # global context defaults
+  @eval ($op){T1<:Real, T2<:Real}(x::Ex{T1}, y::Ex{T2}) =
+    ($op)(global_context(),x,y)
+  @eval ($op){T1<:Real, T2<:Real}(x::Ex{T1}, c::T2) =
+    ($op)(global_context(),x,c)
+  @eval ($op){T1<:Real, T2<:Real}(c::T2, x::Ex{T1}) =
+    ($op)(global_context(),c,x)
+end
+
+# + and - take variable number of args
+for (op, opensmt_func) in @compat Dict(:(+) => opensmt_mk_plus, :(*) => opensmt_mk_times)
+  @eval ($op){T1<:Real, T2<:Real}(ctx::Context, x::Ex{T1}, y::Ex{T2}) =
+    Ex{promote_type(T1,T2)}($opensmt_func(ctx.ctx,[x.e,y.e],Cuint(2)))
+
+  # Var and constant c
+  @eval ($op){T1<:Real, T2<:Real}(ctx::Context, x::Ex{T1}, c::T2) =
+    Ex{promote_type(T1,T2)}($opensmt_func(ctx.ctx,[x.e,convert(Ex{promote_type(T1,T2)},c)], Cuint(2)))
+
+  # constant c and Var
+  @eval ($op){T1<:Real, T2<:Real}(ctx::Context, c::T2, x::Ex{T1}, ) =
+    Ex{promote_type(T1,T2)}($opensmt_func(ctx.ctx,[convert(Ex{promote_type(T1,T2)},c), x.e], Cuint(2)))
+
+  # global context defaults
+  @eval ($op){T1<:Real, T2<:Real}(x::Ex{T1}, y::Ex{T2}) =
+    ($op)(global_context(),x,y)
+  @eval ($op){T1<:Real, T2<:Real}(x::Ex{T1}, c::T2) =
+    ($op)(global_context(),x,c)
+  @eval ($op){T1<:Real, T2<:Real}(c::T2, x::Ex{T1}) =
+    ($op)(global_context(),c,x)
+end
 
 # Unary Real valued functions
 unaryrealop2opensmt = @compat Dict(
@@ -79,6 +110,45 @@ end
 #TODO
 # ITE
 # AND OR
+
+## Logical Functions
+## =================
+
+## Bool × Bool -> Bool
+for (op,opensmt_func) in @compat Dict(:(&) => opensmt_mk_and, :(|) => opensmt_mk_or)
+  @eval ($op)(ctx::Context, x::Ex{Bool}, y::Ex{Bool}) =
+    Ex{Bool}($opensmt_func(ctx.ctx,[x.e,y.e],Cuint(2)))
+
+  # Var and constant c
+  @eval ($op)(ctx::Context, x::Ex{Bool}, c::Bool) =
+    Ex{Bool}($opensmt_func(ctx.ctx,[x.e,convert(Ex{Bool},c)], Cuint(2)))
+
+  # constant c and Var
+  @eval ($op)(ctx::Context, c::Bool, x::Ex{Bool}, ) =
+    Ex{Bool}($opensmt_func(ctx.ctx,[convert(Ex{Bool},c), x.e], Cuint(2)))
+
+  # global context defaults
+  @eval ($op)(x::Ex{Bool}, y::Ex{Bool}) =
+    ($op)(global_context(),x,y)
+  @eval ($op)(x::Ex{Bool}, c::Bool) =
+    ($op)(global_context(),x,c)
+  @eval ($op)(c::Bool, x::Ex{Bool}) =
+    ($op)(global_context(),c,x)
+end
+
+# Implication
+implies{T1<:Union(Bool, Ex{Bool}), T2<:Union(Bool, Ex{Bool})}(ctx::Context, x::T1, y::T2) = 
+  (|)(ctx, (!)(ctx,x), y)
+implies{T1<:Union(Bool, Ex{Bool}), T2<:Union(Bool, Ex{Bool})}(x::T1, y::T2) =
+  implies(global_context(),x,y)
+→ = implies
+
+# Not
+(!)(ctx::Context, e::Ex{Bool}) = Ex{Bool}(opensmt_mk_not(ctx.ctx,e.e))
+(!)(e::Ex{Bool}) = !(global_context(),e)
+
+ifelse{T}(ctx::Context, a::Ex{Bool}, b::Ex{T}, c::Ex{T}) = Ex{T}(opensmt_mk_ite(ctx.ctx, a.e, b.e, c.e))
+ifelse{T}(a::Ex{Bool}, b::Ex{T}, c::Ex{T}) = ifelse(global_context(),a,b,c)
 
 ## Queries
 ## =======
@@ -99,22 +169,34 @@ is_satisfiable() = is_satisfiable(global_context())
 
 @doc "Return a model from the solver"
 function model(ctx::Context, e::Ex{Float64})
-  #TODO, check dirty
+  !is_satisfiable(ctx) && error("Cannot get model from unsatisfiable model")
   Interval(opensmt_get_lb(ctx.ctx,e.e), opensmt_get_ub(ctx.ctx,e.e))
 end
 
 @doc "Return a model from the solver"
 function model(ctx::Context, e::Ex{Bool})
-  #TODO, check dirty
-  opensmt_get_bool(ctx.ctx, e.e)
+  !is_satisfiable(ctx) && error("Cannot get model from unsatisfiable model")
+  Bool(opensmt_get_bool(ctx.ctx, e.e))
 end
 
 function model(ctx::Context, e::Ex{Int})
-  #TODO, check dirty
-  opensmt_get_value(ctx.ctx, e.e)
+  !is_satisfiable(ctx) && error("Cannot get model from unsatisfiable model")
+  round(Int, opensmt_get_lb(ctx.ctx,e.e)), round(Int,opensmt_get_ub(ctx.ctx,e.e))
+end
+
+function model{T}(ctx::Context, es::Array{Ex{T}})
+  !is_satisfiable(ctx) && error("Cannot get model from unsatisfiable model")
+  map(e->model(ctx,e), es)
+end
+
+function model(ctx::Context, es::Ex...)
+  !is_satisfiable(ctx) && error("Cannot get model from unsatisfiable model")
+  map(e->model(ctx,e), es)
 end
 
 model{T}(e::Ex{T}) = model(global_context(),e)
+model{T}(es::Array{Ex{T}}) = model(global_context(),es)
+model(es::Ex...) = model(global_context(),es...)
 
 @doc "Add (assert) a constraint to the solver" ->
 add!(ctx::Context, e::Ex{Bool}) = opensmt_assert(ctx.ctx, e.e)
@@ -131,3 +213,8 @@ reset_ctx!() = reset_ctx!(global_context())
 
 delete_ctx!(ctx::Context) = opensmt_del_context(ctx.ctx)
 delete_ctx!() = delete_ctx!(global_context())
+
+function reset_global_ctx!(l::logic = qf_nra)
+  delete_ctx!(global_context())
+  create_global_ctx!(l)
+end
