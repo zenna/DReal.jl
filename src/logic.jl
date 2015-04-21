@@ -1,4 +1,4 @@
-@enum(logic,
+@enum(Logic,
   qf_uf,         # Uninterpreted Functions
   qf_nra,        # Non-Linear Real Arithmetic
   qf_nra_ode,    # Non-Linear Real Arithmetic

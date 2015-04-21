@@ -11,7 +11,7 @@ reset_ctx!()
 
 # ## Example
 # ## =======
-ctx = opensmt_mk_context(Cuint(1))
+ctx = opensmt_mk_context(@compat UInt32(1))
 opensmt_set_precision(ctx, 0.00001)
 x = opensmt_mk_real_var( ctx, "x" , -3.141592, 3.141592)
 y = opensmt_mk_real_var( ctx, "y" , -3.141592, 3.141592)

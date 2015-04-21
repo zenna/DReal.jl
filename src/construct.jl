@@ -51,7 +51,7 @@ unaryrealop2opensmt = @compat Dict(
   :tanh => opensmt_mk_tanh, :atan2 => opensmt_mk_atan2)
 
 
-for (op, opensmt_func) in @compat Dict(:(-) => opensmt_mk_minus) #, :(/) => opensmt_mk_divide)
+for (op, opensmt_func) in @compat Dict(:(-) => opensmt_mk_minus, :(/) => opensmt_mk_div)
   @eval ($op){T1<:Real, T2<:Real}(ctx::Context, x::Ex{T1}, y::Ex{T2}) =
     Ex{promote_type(T1,T2)}($opensmt_func(ctx.ctx,x.e,y.e))
 
@@ -75,15 +75,15 @@ end
 # + and - take variable number of args
 for (op, opensmt_func) in @compat Dict(:(+) => opensmt_mk_plus, :(*) => opensmt_mk_times)
   @eval ($op){T1<:Real, T2<:Real}(ctx::Context, x::Ex{T1}, y::Ex{T2}) =
-    Ex{promote_type(T1,T2)}($opensmt_func(ctx.ctx,[x.e,y.e],Cuint(2)))
+    Ex{promote_type(T1,T2)}($opensmt_func(ctx.ctx,[x.e,y.e],@compat UInt32(2)))
 
   # Var and constant c
   @eval ($op){T1<:Real, T2<:Real}(ctx::Context, x::Ex{T1}, c::T2) =
-    Ex{promote_type(T1,T2)}($opensmt_func(ctx.ctx,[x.e,convert(Ex{promote_type(T1,T2)},c)], Cuint(2)))
+    Ex{promote_type(T1,T2)}($opensmt_func(ctx.ctx,[x.e,convert(Ex{promote_type(T1,T2)},c)], @compat UInt32(2)))
 
   # constant c and Var
   @eval ($op){T1<:Real, T2<:Real}(ctx::Context, c::T2, x::Ex{T1}, ) =
-    Ex{promote_type(T1,T2)}($opensmt_func(ctx.ctx,[convert(Ex{promote_type(T1,T2)},c), x.e], Cuint(2)))
+    Ex{promote_type(T1,T2)}($opensmt_func(ctx.ctx,[convert(Ex{promote_type(T1,T2)},c), x.e], @compat UInt32(2)))
 
   # global context defaults
   @eval ($op){T1<:Real, T2<:Real}(x::Ex{T1}, y::Ex{T2}) =
@@ -97,7 +97,7 @@ end
 # Unary Real valued functions
 unaryrealop2opensmt = @compat Dict(
   :abs => opensmt_mk_abs, :exp => opensmt_mk_exp, :log => opensmt_mk_log,
-  :pow => opensmt_mk_pow, :sin => opensmt_mk_sin, :cos => opensmt_mk_cos,
+  :(^) => opensmt_mk_pow, :sin => opensmt_mk_sin, :cos => opensmt_mk_cos,
   :tan => opensmt_mk_tan, :asin => opensmt_mk_asin, :acos => opensmt_mk_acos,
   :atan => opensmt_mk_pow, :sinh => opensmt_mk_sinh, :cosh => opensmt_mk_cosh,
   :tanh => opensmt_mk_tanh, :atan2 => opensmt_mk_atan2)
@@ -117,15 +117,15 @@ end
 ## Bool × Bool -> Bool
 for (op,opensmt_func) in @compat Dict(:(&) => opensmt_mk_and, :(|) => opensmt_mk_or)
   @eval ($op)(ctx::Context, x::Ex{Bool}, y::Ex{Bool}) =
-    Ex{Bool}($opensmt_func(ctx.ctx,[x.e,y.e],Cuint(2)))
+    Ex{Bool}($opensmt_func(ctx.ctx,[x.e,y.e],@compat UInt32(2)))
 
   # Var and constant c
   @eval ($op)(ctx::Context, x::Ex{Bool}, c::Bool) =
-    Ex{Bool}($opensmt_func(ctx.ctx,[x.e,convert(Ex{Bool},c)], Cuint(2)))
+    Ex{Bool}($opensmt_func(ctx.ctx,[x.e,convert(Ex{Bool},c)], @compat UInt32(2)))
 
   # constant c and Var
   @eval ($op)(ctx::Context, c::Bool, x::Ex{Bool}, ) =
-    Ex{Bool}($opensmt_func(ctx.ctx,[convert(Ex{Bool},c), x.e], Cuint(2)))
+    Ex{Bool}($opensmt_func(ctx.ctx,[convert(Ex{Bool},c), x.e], @compat UInt32(2)))
 
   # global context defaults
   @eval ($op)(x::Ex{Bool}, y::Ex{Bool}) =
@@ -152,7 +152,7 @@ ifelse{T}(a::Ex{Bool}, b::Ex{T}, c::Ex{T}) = ifelse(global_context(),a,b,c)
 
 ## Queries
 ## =======
-@doc "Is predicate Y satisfiable?" ->
+# @doc "Is predicate Y satisfiable?" ->
 # is_satisfiable(ctx::Context) = [false,"UNKNOWN",true][opensmt_check(ctx.ctx)+2]
 function is_satisfiable(ctx::Context)
   sat = opensmt_check(ctx.ctx)
@@ -167,16 +167,16 @@ end
 
 is_satisfiable() = is_satisfiable(global_context())
 
-@doc "Return a model from the solver"
+# @doc "Return a model from the solver" ->
 function model(ctx::Context, e::Ex{Float64})
   !is_satisfiable(ctx) && error("Cannot get model from unsatisfiable model")
   Interval(opensmt_get_lb(ctx.ctx,e.e), opensmt_get_ub(ctx.ctx,e.e))
 end
 
-@doc "Return a model from the solver"
+# @doc "Return a model from the solver" ->
 function model(ctx::Context, e::Ex{Bool})
   !is_satisfiable(ctx) && error("Cannot get model from unsatisfiable model")
-  Bool(opensmt_get_bool(ctx.ctx, e.e))
+  @compat Bool(opensmt_get_bool(ctx.ctx, e.e))
 end
 
 function model(ctx::Context, e::Ex{Int})
@@ -198,7 +198,7 @@ model{T}(e::Ex{T}) = model(global_context(),e)
 model{T}(es::Array{Ex{T}}) = model(global_context(),es)
 model(es::Ex...) = model(global_context(),es...)
 
-@doc "Add (assert) a constraint to the solver" ->
+# @doc "Add (assert) a constraint to the solver" ->
 add!(ctx::Context, e::Ex{Bool}) = opensmt_assert(ctx.ctx, e.e)
 add!(e::Ex{Bool}) = add!(global_context(), e)
 
@@ -214,7 +214,7 @@ reset_ctx!() = reset_ctx!(global_context())
 delete_ctx!(ctx::Context) = opensmt_del_context(ctx.ctx)
 delete_ctx!() = delete_ctx!(global_context())
 
-function reset_global_ctx!(l::logic = qf_nra)
+function reset_global_ctx!(l::Logic = qf_nra)
   delete_ctx!(global_context())
   create_global_ctx!(l)
 end

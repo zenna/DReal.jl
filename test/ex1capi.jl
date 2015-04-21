@@ -3,15 +3,16 @@ import dReal: opensmt_context, opensmt_set_verbosity, opensmt_assert, opensmt_ch
               opensmt_mk_bool_var, opensmt_mk_int_var, opensmt_mk_minus, opensmt_mk_leq, opensmt_mk_num_from_string,
               opensmt_push, opensmt_pop, opensmt_reset, opensmt_del_context
 using Base.Test
+using Compat
 
 # Blank slate
 reset_ctx!()
 
 print( "Creating context\n" )
-ctx = opensmt_mk_context(Cuint(1))
+ctx = opensmt_mk_context(@compat UInt32(1))
 
  # Setting verbosity
-opensmt_set_verbosity(ctx, Cint(4))
+opensmt_set_verbosity(ctx, @compat Int32(4))
 
  # Creating boolean variables
 print( "Creating some boolean variables\n" )
@@ -21,9 +22,9 @@ c = opensmt_mk_bool_var( ctx, "c" )
 
  # Creating integer variables
 print( "Creating some integer variables\n" )
-x = opensmt_mk_int_var( ctx, "x" , -100, 100)
-y = opensmt_mk_int_var( ctx, "y" , -100, 100)
-z = opensmt_mk_int_var( ctx, "z" , -100, 100)
+@compat x = opensmt_mk_int_var( ctx, "x" , Int32(-100), Int32(100))
+@compat y = opensmt_mk_int_var( ctx, "y" , Int32(-100), Int32(100))
+@compat z = opensmt_mk_int_var( ctx, "z" , Int32(-100), Int32(100))
  # Creating inequality
 print( "Creating x - y <= 0\n" )
 

@@ -3,6 +3,7 @@ module dReal
 using AbstractDomains
 using Compat
 
+# Libdl compat
 if VERSION >= v"0.4.0-dev"
   RTLD_LAZY =  Libdl.RTLD_LAZY
   RTLD_DEEPBIND = Libdl.RTLD_DEEPBIND
@@ -10,6 +11,15 @@ if VERSION >= v"0.4.0-dev"
   compat_dlopen = Libdl.dlopen
 else
   compat_dlopen = dlopen
+end
+
+# Conversion to numeric types
+if VERSION >= v"0.4.0-dev"
+  compat_cuint = Cuint
+  compat_cint = Cint
+else
+  compat_cuint = x->convert(Cuint,x)
+  compat_cint = x->convert(Cint, x)
 end
 
 try
@@ -25,11 +35,16 @@ end
 
 compat_dlopen("libdreal.so", RTLD_LAZY|RTLD_DEEPBIND|RTLD_GLOBAL)
 
+import Base: print, show
+import Base:  abs, exp, log,
+              ^, sin, cos,
+              tan, asin, acos,
+              atan, sinh, cosh,
+              tanh, atan2
 
-import Base: cos, sin, (==), print, show
 export
   Context,
-  logic,
+  Logic,
   model,
   init_dreal!,
   set_precision!,
@@ -49,14 +64,16 @@ export
 
 
 include("wrap_capi.jl")
-include("logic.jl")
+# Julia 0.3 does not have enums
+if VERSION >= v"0.4.0-dev"
+  include("logic.jl")
+else
+  include("logicv3.jl")
+end
 include("context.jl")
 include("environment.jl")
 include("expression.jl")
 include("construct.jl")
-
-# export
-#   Context,
 
 export
   qf_uf,         # Uninterpreted Functions
@@ -70,7 +87,7 @@ export
   qf_ufidl,      # UF + IDL
   qf_uflra,      # UF + LRA
   qf_bool,       # Only booleans
-  qf_ct        # Cost
+  qf_ct          # Cost
 
 init_dreal!()
 end

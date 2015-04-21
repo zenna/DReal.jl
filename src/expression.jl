@@ -1,4 +1,4 @@
-@doc "a dReal typed Expression" ->
+# @doc "a dReal typed Expression" ->
 immutable Ex{T}
   e::Ptr{Void}
 end
@@ -6,11 +6,15 @@ end
 ## TODO
 ## Check that lb <= ub
 
-@doc "Create a variable" ->
+# @doc "Create a variable" ->
 Var(ctx::Context, T::Type{Float64}, name::ASCIIString, lb::Float64, ub::Float64) =
   Ex{T}(opensmt_mk_real_var(ctx.ctx, name, lb, ub))
-Var(ctx::Context, T::Type{Int64}, name::ASCIIString, lb::Int, ub::Int) =
+Var(ctx::Context, T::Type{Int64}, name::ASCIIString, lb::Int32, ub::Int32) =
   Ex{T}(opensmt_mk_int_var(ctx.ctx, name, lb, ub))
+Var(ctx::Context, T::Type{Int64}, name::ASCIIString, lb::Int64, ub::Int64) =
+  @compat Ex{T}(opensmt_mk_int_var(ctx.ctx, name, Int32(lb), Int32(ub)))
+Var(ctx::Context, T::Type{Int64}, name::ASCIIString) =
+  Ex{T}(opensmt_mk_int_var(ctx.ctx, name, typemin(Cint), typemax(Cint)))  
 Var(ctx::Context,T::Type{Bool}, name::ASCIIString) =
   Ex{T}(opensmt_mk_bool_var(ctx.ctx, name))
 

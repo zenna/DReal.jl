@@ -106,9 +106,6 @@ opensmt_mk_int_var(ctx::opensmt_context, varname::ASCIIString, lb::Cint, ub::Cin
   ccall((:opensmt_mk_int_var, "libdreal"), Ptr{Void},
         (Ptr{Void}, Ptr{UInt8}, Cint, Cint), ctx, varname, lb, ub)
 
-opensmt_mk_int_var(ctx, varname::ASCIIString, lb, ub) =
-  opensmt_mk_int_var(ctx, varname, Cint(lb), Cint(ub))
-
 opensmt_mk_cost_var(ctx::opensmt_context, varname::Ptr{UInt8}) =
   ccall((:opensmt_mk_cost_var, "libdreal"), Ptr{Void}, (Ptr{Void}, Ptr{UInt8}), ctx, varname)
 
@@ -149,6 +146,10 @@ opensmt_mk_minus(ctx::opensmt_context, e1::opensmt_expr, e2::opensmt_expr) =
 opensmt_mk_times(ctx::opensmt_context, es::Vector{opensmt_expr}, i::Cuint) =
   ccall((:opensmt_mk_times, "libdreal"), Ptr{Void},
         (Ptr{Void}, Ptr{opensmt_expr}, Cuint), ctx, es, i)
+
+opensmt_mk_div(ctx::opensmt_context, e1::opensmt_expr, e2::opensmt_expr) =
+  ccall((:opensmt_mk_div, "libdreal"), Ptr{Void},
+        (Ptr{Void}, Ptr{Void}, Ptr{Void}), ctx, e1, e2)
 
 opensmt_mk_lt(ctx::opensmt_context, e1::opensmt_expr, e2::opensmt_expr) =
   ccall((:opensmt_mk_lt, "libdreal"), Ptr{Void},

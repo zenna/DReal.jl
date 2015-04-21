@@ -14,11 +14,11 @@ using Base.Test
 (exit)
 """
 
-x = Var(Int, "x", 10,20)
-y = Var(Float64, "y", 30.0, 66.)
-add!(sin(x) - y <= 0.3)
-@test is_satisfiable()
-@show model(x,y)
+# x = Var(Int, "x", 10,20)
+# y = Var(Float64, "y", 30.0, 66.)
+# add!(sin(x) - y <= 0.3)
+# @test is_satisfiable()
+# @show model(x,y)
 
 reset_global_ctx!()
 
