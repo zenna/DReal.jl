@@ -19,7 +19,7 @@ Pkg.clone("https://github.com/zenna/dReal.jl.git")
 
 # Getting Started
 
-```Julia
+```julia
 x = Var(Int,"x")
 y = Var(Int,"y")
 add!((x > 2) & (y < 10) & (x + 2*y == 7))
@@ -34,7 +34,7 @@ Use `add!` to assert that any proposition `Ex{Bool}` value must be true. We then
 
 Similarly to the previous example, we can use create models using Real or `Float64` variables:
 
-```
+```julia
 x = Var(Float64,'x',-100,100)
 y = Var(Float64,'y',-100,100)
 is_satisfiable(x^2 + y^2 > 3, x^3 + y < 5)
