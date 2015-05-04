@@ -27,6 +27,7 @@ export LD_LIBRARY_PATH=`pwd`
 # Getting Started
 
 ```julia
+using dReal
 x = Var(Int,"x")
 y = Var(Int,"y")
 add!((x > 2) & (y < 10) & (x + 2*y == 7))

@@ -181,7 +181,7 @@ end
 
 function model(ctx::Context, e::Ex{Int})
   !is_satisfiable(ctx) && error("Cannot get model from unsatisfiable model")
-  round(Int, opensmt_get_lb(ctx.ctx,e.e)), round(Int,opensmt_get_ub(ctx.ctx,e.e))
+  Interval(round(Int, opensmt_get_lb(ctx.ctx,e.e)), round(Int,opensmt_get_ub(ctx.ctx,e.e)))
 end
 
 function model{T}(ctx::Context, es::Array{Ex{T}})
