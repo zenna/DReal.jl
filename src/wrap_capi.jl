@@ -102,9 +102,9 @@ opensmt_mk_real_var(ctx::opensmt_context, varname::ASCIIString, lb::Float64, ub:
   ccall((:opensmt_mk_real_var, "libdreal"), Ptr{Void},
         (Ptr{Void}, Ptr{UInt8}, Float64, Float64), ctx, varname, lb, ub)
 
-opensmt_mk_int_var(ctx::opensmt_context, varname::ASCIIString, lb::Cint, ub::Cint) =
+opensmt_mk_int_var(ctx::opensmt_context, varname::ASCIIString, lb::Int64, ub::Int64) =
   ccall((:opensmt_mk_int_var, "libdreal"), Ptr{Void},
-        (Ptr{Void}, Ptr{UInt8}, Cint, Cint), ctx, varname, lb, ub)
+        (Ptr{Void}, Ptr{UInt8}, Int64, Int64), ctx, varname, lb, ub)
 
 opensmt_mk_cost_var(ctx::opensmt_context, varname::Ptr{UInt8}) =
   ccall((:opensmt_mk_cost_var, "libdreal"), Ptr{Void}, (Ptr{Void}, Ptr{UInt8}), ctx, varname)
