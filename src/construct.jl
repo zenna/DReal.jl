@@ -176,7 +176,14 @@ end
 # @doc "Return a model from the solver" ->
 function model(ctx::Context, e::Ex{Bool})
   !is_satisfiable(ctx) && error("Cannot get model from unsatisfiable model")
-  @compat Bool(opensmt_get_bool(ctx.ctx, e.e))
+  sat = opensmt_get_bool(ctx.ctx, e.e)
+  if sat == 1
+    return true
+  elseif sat == -1
+    return false
+  else 
+    error("Unknown Boolean Value")
+  end
 end
 
 function model(ctx::Context, e::Ex{Int})
