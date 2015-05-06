@@ -77,7 +77,7 @@ is_satisfiable() # false
 
 # Boolean Logic
 
-dReal supports boolean operators: And (`&`), Or (`|`), Not (`!`), implies (`implies` or → (`\rightarrow`)) and if-then-else (`ifelse`).  Bi­implications are
+dReal supports boolean operators: And (`&`), Or (`|`), Not (`!`), implies (`implies` or → (`\rightarrow`))   and if-then-else (`ifelse`).  Bi­implications are
 represented using equality `==`.  The following example shows how to solve a simple set of Boolean constraints.
 
 ```julia
