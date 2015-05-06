@@ -1,20 +1,13 @@
 # dReal.jl
 
-This is a julia wrapper for the [dReal SMT solver](https://dreal.github.io/)
+This is a Julia wrapper for the [dReal SMT solver](https://dreal.github.io/).
+dReal allows you to answer [satisfiability problems](http://en.wikipedia.org/wiki/Satisfiability_modulo_theories).  That is, you can ask questions of the form: __is there some assignment to my variables `x1`,`x2`,`x3`,..., that makes my formula over these variables true__.  
 
 [![Build Status](https://travis-ci.org/zenna/dReal.jl.svg?branch=master)](https://travis-ci.org/zenna/dReal.jl)
 
-# Requirements
+# Prerequisites
 [dReal](https://github.com/dreal/dreal3) (with shared library installed)
 
-# Installation
-dReal.jl is not yet in the official Julia Package repository.  You can still easily install it from a Julia repl with
-
-```julia
-Pkg.clone("https://github.com/dreal/dReal.jl.git")
-```
-
-## Prequisites
 - [Visit the release page of dReal](https://github.com/dreal/dreal3/releases), [download the latest shared libraries](https://github.com/dreal/dreal3/releases/download/v3.15.04.2/dReal-3.15.04.2-linux-shared-lib.tar.gz), and set up `LD_LIBRARY_PATH` environment variable.
 
   ```bash
@@ -24,7 +17,22 @@ cd dReal-3.15.04.2-linux/lib
 export LD_LIBRARY_PATH=`pwd`
   ```
 
+# Installation
+dReal.jl is not yet in the official Julia Package repository.  You can still easily install it from a Julia repl with
+
+```julia
+Pkg.clone("https://github.com/dreal/dReal.jl.git")
+```
+
+dReal can then be loaded with:
+
+```julia
+using dReal
+```
+
 # Getting Started
+
+To ask is there some Integer `x` and some Integer `y` such that `x > 2` and `y < 10` and `x + 2*y ==7`, y ou could write:
 
 ```julia
 using dReal
@@ -40,7 +48,7 @@ Use `add!` to assert that any proposition `Ex{Bool}` value must be true. We then
 
 ## Real Valued Arithmetic
 
-Similarly to the previous example, we can use create models using Real or `Float64` variables:
+Similarly to the previous example, we can use create models using Real (`Float64`) variables:
 
 ```julia
 x = Var(Float64,"x",-100.0,100.0)
@@ -66,9 +74,10 @@ c = (2π - 2*x1*asin(cos(0.797) * sin(π/x1))) <= (-0.591 - 0.0331 *x2 + 0.506 +
 add!(c)
 is_satisfiable() # false
 ```
+
 # Boolean Logic
 
-dReal supports boolean operators: And (`&`), Or (`|`), Not (`!`), implies (`implies` or `\rightarrow` and if-then-else (`ifelse`).  Bi­implications are
+dReal supports boolean operators: And (`&`), Or (`|`), Not (`!`), implies (`implies` or → (`\rightarrow`)) and if-then-else (`ifelse`).  Bi­implications are
 represented using equality `==`.  The following example shows how to solve a simple set of Boolean constraints.
 
 ```julia
