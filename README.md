@@ -15,12 +15,12 @@ Pkg.clone("https://github.com/dreal/dReal.jl.git")
 ```
 
 ## Prequisites
-- [Visit the release page of dReal](https://github.com/dreal/dreal3/releases), [download the latest shared libraries](https://github.com/dreal/dreal3/releases/download/v3.15.04.2/dReal-3.15.04.2-linux-shared-lib.tar.gz), and set up `LD_LIBRARY_PATH` environment variable.
+- [Visit the release page of dReal](https://github.com/dreal/dreal3/releases), [download the latest shared libraries](https://github.com/dreal/dreal3/releases/download/v3.15.05/dReal-3.15.05-linux-shared-libs.tar.gz), and set up `LD_LIBRARY_PATH` environment variable.
 
   ```bash
-wget https://github.com/dreal/dreal3/releases/download/v3.15.04.2/dReal-3.15.04.2-linux-shared-lib.tar.gz
-tar xvfz dReal-3.15.04.2-linux-shared-lib.tar.gz
-cd dReal-3.15.04.2-linux/lib
+wget https://github.com/dreal/dreal3/releases/download/v3.15.05/dReal-3.15.05-linux-shared-libs.tar.gz
+tar xvfz dReal-3.15.05-linux-shared-libs.tar.gz
+cd dReal-3.15.05-linux/lib
 export LD_LIBRARY_PATH=`pwd`
   ```
 
