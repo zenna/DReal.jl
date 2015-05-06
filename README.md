@@ -11,7 +11,7 @@ This is a julia wrapper for the [dReal SMT solver](https://dreal.github.io/)
 dReal.jl is not yet in the official Julia Package repository.  You can still easily install it from a Julia repl with
 
 ```julia
-Pkg.clone("https://github.com/zenna/dReal.jl.git")
+Pkg.clone("https://github.com/dreal/dReal.jl.git")
 ```
 
 ## Prequisites
@@ -43,10 +43,10 @@ Use `add!` to assert that any proposition `Ex{Bool}` value must be true. We then
 Similarly to the previous example, we can use create models using Real or `Float64` variables:
 
 ```julia
-x = Var(Float64,'x',-100,100)
-y = Var(Float64,'y',-100,100)
-is_satisfiable(x^2 + y^2 > 3, x^3 + y < 5)
-model(x,y)
+x = Var(Float64,"x",-100.0,100.0)
+y = Var(Float64,"y",-100.0,100.0)
+add!((x^2 + y^2 > 4) & (x^3 + y < 5))
+x,y = model(x,y)
 ```
 
 This example also shows how to extract a *model*. A model is an assignment of  values to variables that makes the model satisfiable.  Use `model`, and any variable used in the system to extract relevant variables in a model.  __Note__: `model` only makes sense when the system is satisfiable, otherwise it will throw an error.

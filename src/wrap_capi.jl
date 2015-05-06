@@ -67,7 +67,7 @@ opensmt_get_ub(ctx::opensmt_context, e::opensmt_expr) =
   ccall((:opensmt_get_ub, "libdreal"), Float64, (Ptr{Void}, Ptr{Void}), ctx, e)
 
 opensmt_get_bool(ctx::opensmt_context, e::opensmt_expr) = 
-  ccall((:opensmt_get_bool, "libdreal"), Cuint, (Ptr{Void}, Ptr{Void}), ctx, e)
+  ccall((:opensmt_get_bool, "libdreal"), Cint, (Ptr{Void}, Ptr{Void}), ctx, e)
 
 opensmt_prefer(e::opensmt_expr) = 
   ccall((:opensmt_prefer, "libdreal"), Cuint, (Ptr{Void}, Ptr{Void}), e)
