@@ -1,9 +1,10 @@
 # dReal.jl
 
-This is a Julia wrapper for the [dReal SMT solver](https://dreal.github.io/).
-dReal allows you to answer [satisfiability problems](http://en.wikipedia.org/wiki/Satisfiability_modulo_theories).  That is, you can ask questions of the form: __is there some assignment to my variables `x1`,`x2`,`x3`,..., that makes my formula over these variables true__.  
+[![Build Status](https://travis-ci.org/zenna/dReal.jl.svg?branch=master)](https://travis-ci.org/dreal/dReal.jl)
 
-[![Build Status](https://travis-ci.org/zenna/dReal.jl.svg?branch=master)](https://travis-ci.org/zenna/dReal.jl)
+This is a Julia wrapper for the [dReal SMT solver](https://dreal.github.io/).
+dReal allows you to answer [satisfiability problems](http://en.wikipedia.org/wiki/Satisfiability_modulo_theories).  That is, you can ask questions of the form: __is there some assignment to my variables `x1`,`x2`,`x3`,..., that makes my formula over these variables true?__.  
+
 
 # Prerequisites
 [dReal](https://github.com/dreal/dreal3) (with shared library installed)

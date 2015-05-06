@@ -22,9 +22,9 @@ c = opensmt_mk_bool_var( ctx, "c" )
 
  # Creating integer variables
 print( "Creating some integer variables\n" )
-@compat x = opensmt_mk_int_var( ctx, "x" , Int32(-100), Int32(100))
-@compat y = opensmt_mk_int_var( ctx, "y" , Int32(-100), Int32(100))
-@compat z = opensmt_mk_int_var( ctx, "z" , Int32(-100), Int32(100))
+x = opensmt_mk_int_var( ctx, "x" , -100, 100)
+y = opensmt_mk_int_var( ctx, "y" , -100, 100)
+z = opensmt_mk_int_var( ctx, "z" , -100, 100)
  # Creating inequality
 print( "Creating x - y <= 0\n" )
 
