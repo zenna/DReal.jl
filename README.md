@@ -8,14 +8,15 @@ dReal allows you to answer [satisfiability problems](http://en.wikipedia.org/wik
 # Prerequisites
 [dReal](https://github.com/dreal/dreal3) (with shared library installed)
 
-- [Visit the release page of dReal](https://github.com/dreal/dreal3/releases), [download the latest shared libraries](https://github.com/dreal/dreal3/releases/download/v3.15.04.2/dReal-3.15.04.2-linux-shared-lib.tar.gz), and set up `LD_LIBRARY_PATH` environment variable.
+- [Visit the release page of dReal](https://github.com/dreal/dreal3/releases), [download the latest shared libraries](https://github.com/dreal/dreal3/releases/download/v3.15.05/dReal-3.15.05-linux-shared-libs.tar.gz), and set up `LD_LIBRARY_PATH` environment variable.
 
-  ```bash
-wget https://github.com/dreal/dreal3/releases/download/v3.15.04.2/dReal-3.15.04.2-linux-shared-lib.tar.gz
-tar xvfz dReal-3.15.04.2-linux-shared-lib.tar.gz
-cd dReal-3.15.04.2-linux/lib
+
+```bash
+wget https://github.com/dreal/dreal3/releases/download/v3.15.05/dReal-3.15.05-linux-shared-libs.tar.gz
+tar xvfz dReal-3.15.05-linux-shared-libs.tar.gz
+cd dReal-3.15.05-linux/lib
 export LD_LIBRARY_PATH=`pwd`
-  ```
+```
 
 # Installation
 dReal.jl is not yet in the official Julia Package repository.  You can still easily install it from a Julia repl with

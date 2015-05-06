@@ -10,11 +10,11 @@ end
 Var(ctx::Context, T::Type{Float64}, name::ASCIIString, lb::Float64, ub::Float64) =
   Ex{T}(opensmt_mk_real_var(ctx.ctx, name, lb, ub))
 Var(ctx::Context, T::Type{Int64}, name::ASCIIString, lb::Int32, ub::Int32) =
-  Ex{T}(opensmt_mk_int_var(ctx.ctx, name, lb, ub))
+  Ex{T}(opensmt_mk_int_var(ctx.ctx, name, Int64(lb), Int64(ub)))
 Var(ctx::Context, T::Type{Int64}, name::ASCIIString, lb::Int64, ub::Int64) =
-  @compat Ex{T}(opensmt_mk_int_var(ctx.ctx, name, Int32(lb), Int32(ub)))
+  @compat Ex{T}(opensmt_mk_int_var(ctx.ctx, name, lb, ub))
 Var(ctx::Context, T::Type{Int64}, name::ASCIIString) =
-  Ex{T}(opensmt_mk_int_var(ctx.ctx, name, typemin(Cint), typemax(Cint)))  
+  Ex{T}(opensmt_mk_int_var(ctx.ctx, name, typemin(Int64), typemax(Int64)))  
 Var(ctx::Context,T::Type{Bool}, name::ASCIIString) =
   Ex{T}(opensmt_mk_bool_var(ctx.ctx, name))
 
