@@ -3,37 +3,18 @@ module dReal
 using AbstractDomains
 using Compat
 
-# Libdl compat
-if VERSION >= v"0.4.0-dev"
-  RTLD_LAZY =  Libdl.RTLD_LAZY
-  RTLD_DEEPBIND = Libdl.RTLD_DEEPBIND
-  RTLD_GLOBAL = Libdl.RTLD_GLOBAL
-  compat_dlopen = Libdl.dlopen
-else
-  compat_dlopen = dlopen
-end
-
-# Conversion to numeric types
-if VERSION >= v"0.4.0-dev"
-  compat_cuint = Cuint
-  compat_cint = Cint
-else
-  compat_cuint = x->convert(Cuint,x)
-  compat_cint = x->convert(Cint, x)
-end
-
 try
-  compat_dlopen("libprim.so", RTLD_LAZY|RTLD_DEEPBIND|RTLD_GLOBAL)
-  compat_dlopen("libClp.so", RTLD_LAZY|RTLD_DEEPBIND|RTLD_GLOBAL)
-  compat_dlopen("libibex.so", RTLD_LAZY|RTLD_DEEPBIND|RTLD_GLOBAL)
-  compat_dlopen("libgflags.so", RTLD_LAZY|RTLD_DEEPBIND|RTLD_GLOBAL)
-  compat_dlopen("libglog.so", RTLD_LAZY|RTLD_DEEPBIND|RTLD_GLOBAL)
-  compat_dlopen("libcapd.so", RTLD_LAZY|RTLD_DEEPBIND|RTLD_GLOBAL)
-catch
-  error("Could not load required shared libraries")
+  @compat Libdl.dlopen("libprim.so", Libdl.RTLD_LAZY|Libdl.RTLD_DEEPBIND|Libdl.RTLD_GLOBAL)
+  @compat Libdl.dlopen("libClp.so", Libdl.RTLD_LAZY|Libdl.RTLD_DEEPBIND|Libdl.RTLD_GLOBAL)
+  @compat Libdl.dlopen("libibex.so", Libdl.RTLD_LAZY|Libdl.RTLD_DEEPBIND|Libdl.RTLD_GLOBAL)
+  @compat Libdl.dlopen("libgflags.so", Libdl.RTLD_LAZY|Libdl.RTLD_DEEPBIND|Libdl.RTLD_GLOBAL)
+  @compat Libdl.dlopen("libglog.so", Libdl.RTLD_LAZY|Libdl.RTLD_DEEPBIND|Libdl.RTLD_GLOBAL)
+  @compat Libdl.dlopen("libcapd.so", Libdl.RTLD_LAZY|Libdl.RTLD_DEEPBIND|Libdl.RTLD_GLOBAL)
+  @compat Libdl.dlopen("libdreal.so", Libdl.RTLD_LAZY|Libdl.RTLD_DEEPBIND|Libdl.RTLD_GLOBAL)
+catch e
+  println("Could not load required shared libraries")
+  rethrow(e)
 end
-
-compat_dlopen("libdreal.so", RTLD_LAZY|RTLD_DEEPBIND|RTLD_GLOBAL)
 
 import Base: print, show
 import Base:  abs, exp, log,
