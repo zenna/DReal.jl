@@ -98,7 +98,7 @@ model(p,q,r)
 
 # Optimisation
 
-dReal.jl has tools for constrained optimisation.  One strength of optimisation in dReal is that the constraints and the objective function can be non-linear or discontinous.  The function `minimize(obj::Ex,vars::Ex...)` takes as input a value `obj` to to be minimised, and any variables whose.
+dReal.jl has tools for constrained optimisation.  One strength of optimisation in dReal is that the constraints and the objective function can be non-linear or discontinous.  The function `minimize(obj::Ex,vars::Ex...)` takes as input a value `obj` to to be minimised, and any variables `vars` whose optimal values you would like to get.  It returns a `Tuple` (a pair) of the optimal cost and corresponding values of the vars you specified.
 
 As an example we can minimize the [rastrigins function](http://en.wikipedia.org/wiki/Rastrigin_function), which takes vector `x` of reals, each between -5.12 and 5.12  as input, and has a global minimum at `x = 0`, of 0.
 
