@@ -8,10 +8,11 @@ env:
     - JULIAVERSION="juliareleases"
     - JULIAVERSION="julianightlies"
 before_install:
+  - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
   - sudo add-apt-repository ppa:staticfloat/julia-deps -y
   - sudo add-apt-repository ppa:staticfloat/${JULIAVERSION} -y
   - sudo apt-get update -qq -y
-  - sudo apt-get install libpcre3-dev julia -y
+  - sudo apt-get install libstdc++6 libpcre3-dev julia -y
   - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
 script:
   - wget https://github.com/dreal/dreal3/releases/download/v3.15.05/dReal-3.15.05-linux-shared-libs.tar.gz

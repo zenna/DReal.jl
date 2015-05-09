@@ -8,17 +8,22 @@ dReal allows you to answer [satisfiability problems](http://en.wikipedia.org/wik
 dReal also allows you to do non-linear, constrained, optimisation.
 
 # Prerequisites
-[dReal](https://github.com/dreal/dreal3) (with shared library installed)
 
-- [Visit the release page of dReal](https://github.com/dreal/dreal3/releases), [download the latest shared libraries](https://github.com/dreal/dreal3/releases/download/v3.15.05/dReal-3.15.05-linux-shared-libs.tar.gz), and set up `LD_LIBRARY_PATH` environment variable.
+ - [dReal](https://github.com/dreal/dreal3) (with shared library installed): [Visit the release page of dReal](https://github.com/dreal/dreal3/releases), [download the latest shared libraries](https://github.com/dreal/dreal3/releases/download/v3.15.05/dReal-3.15.05-linux-shared-libs.tar.gz), and set up `LD_LIBRARY_PATH` environment variable.
 
-
-```bash
-wget https://github.com/dreal/dreal3/releases/download/v3.15.05/dReal-3.15.05-linux-shared-libs.tar.gz
-tar xvfz dReal-3.15.05-linux-shared-libs.tar.gz
-cd dReal-3.15.05-linux/lib
-export LD_LIBRARY_PATH=`pwd`
-```
+    ```bash
+    wget https://github.com/dreal/dreal3/releases/download/v3.15.05/dReal-3.15.05-linux-shared-libs.tar.gz
+    tar xvfz dReal-3.15.05-linux-shared-libs.tar.gz
+    cd dReal-3.15.05-linux/lib
+    export LD_LIBRARY_PATH=`pwd`
+    ```
+ - libstdc++6: In Ubuntu, please do the following install to install it.
+ 
+    ```bash
+    sudo add-apt-repository --yes ppa:ubuntu-toolchain-r/test # needed for 12.04
+    sudo apt-get update
+    sudo apt-get install libstdc++6
+    ```
 
 # Installation
 dReal.jl is not yet in the official Julia Package repository.  You can still easily install it from a Julia repl with
