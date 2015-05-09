@@ -2,7 +2,6 @@ module dReal
 
 using AbstractDomains
 using Compat
-using Docile
 
 VERSION < v"0.4-" && using Docile
 
