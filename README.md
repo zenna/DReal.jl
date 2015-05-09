@@ -3,8 +3,9 @@
 [![Build Status](https://travis-ci.org/dreal/dReal.jl.svg?branch=master)](https://travis-ci.org/dreal/dReal.jl)
 
 This is a Julia wrapper for the [dReal SMT solver](https://dreal.github.io/).
-dReal allows you to answer [satisfiability problems](http://en.wikipedia.org/wiki/Satisfiability_modulo_theories).  That is, you can ask questions of the form: __is there some assignment to my variables `x1`,`x2`,`x3`,..., that makes my formula over these variables true?__.  
+dReal allows you to answer [satisfiability problems](http://en.wikipedia.org/wiki/Satisfiability_modulo_theories).  That is, you can ask questions of the form: __is there some assignment to my variables `x1`,`x2`,`x3`,..., that makes my formula over these variables true?__.
 
+dReal also allows you to do non-linear, constrained, optimisation.
 
 # Prerequisites
 [dReal](https://github.com/dreal/dreal3) (with shared library installed)
@@ -88,4 +89,31 @@ q = Bool('q')
 r = Bool('r')
 add!(p → q & r == !q & (!p | r))
 model(p,q,r)
+```
+
+# Optimisation
+
+dReal.jl has tools for constrained optimisation.  One strength of optimisation in dReal is that the constraints and the objective function can be non-linear or discontinous.  The function `minimize(obj::Ex,vars::Ex...)` takes as input a value `obj` to to be minimised, and any variables whose.
+
+As an example we can minimize the [rastrigins function](http://en.wikipedia.org/wiki/Rastrigin_function), which takes vector of reals, each between -5.12 and 5.12  as input, and has a global minimum at x = 0, of 0.
+
+```julia
+rastrigin(x::Array) = 10 * length(x) + sum([xi*xi - 10*cos(2pi*xi) for xi in x])
+
+x = Var(Float64,"x",-5.12,5.12)
+y = Var(Float64,"y",-5.12,5.12)
+f = Var(Float64,"f",-10.,10.)
+add!(f == rastrigin([x,y]))
+cost, assignment =  minimize(f,x,y; lb=-10.,ub = 10.)
+println("the assignment of x=$(assignment[1]) and y=$(assignment[2]) minimises rastrigin to $cost")
+the assignment of x=[0.0 0.0] and y=[0.0 0.0] minimises rastrigin to [0.0 -0.0]
+```
+
+__caution:__ the value of the cost function may be a declared variable.  The following code may produce wrong or erratic results
+
+```julia
+x = Var(Float64,"x",-5.12,5.12)
+y = Var(Float64,"y",-5.12,5.12)
+# we did not declare a value for the cost
+cost, assignment =  minimize(rastrigin([x,y]),x,y; lb=-10.,ub = 10.)
 ```

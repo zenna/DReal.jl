@@ -2,6 +2,9 @@ module dReal
 
 using AbstractDomains
 using Compat
+using Docile
+
+VERSION < v"0.4-" && using Docile
 
 try
   @compat Libdl.dlopen("libprim.so", Libdl.RTLD_LAZY|Libdl.RTLD_DEEPBIND|Libdl.RTLD_GLOBAL)
@@ -41,7 +44,8 @@ export
   delete_ctx!,
   reset_global_ctx!,
   →,
-  implies
+  implies,
+  minimize
 
 
 include("wrap_capi.jl")
@@ -55,6 +59,8 @@ include("context.jl")
 include("environment.jl")
 include("expression.jl")
 include("construct.jl")
+include("optimize.jl")
+
 
 export
   qf_uf,         # Uninterpreted Functions

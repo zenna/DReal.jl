@@ -42,16 +42,11 @@ for (op,opensmt_func) in boolop2opensmt
   @eval ($op){T1<:Real, T2<:Real}(c::T1, x::Ex{T2}) = ($op)(global_context(), c, x)
 end
 
-# Binary Real valued functions
-unaryrealop2opensmt = @compat Dict(
-  :abs => opensmt_mk_abs, :exp => opensmt_mk_exp, :log => opensmt_mk_log,
-  :pow => opensmt_mk_pow, :sin => opensmt_mk_sin, :cos => opensmt_mk_cos,
-  :tan => opensmt_mk_tan, :asin => opensmt_mk_asin, :acos => opensmt_mk_acos,
-  :atan => opensmt_mk_pow, :sinh => opensmt_mk_sinh, :cosh => opensmt_mk_cosh,
-  :tanh => opensmt_mk_tanh, :atan2 => opensmt_mk_atan2)
+# To fix type ambiguity
+(^){T1<:Real,T2<:Integer}(ctx::Context, x::Ex{T1},c::T2) = Ex{promote_type(T1,T2)}(opensmt_mk_pow(ctx.ctx,x.e,convert(Ex{promote_type(T1,T2)},c)))
+(^){T1<:Real,T2<:Integer}(X::Ex{T1},c::T2) = (^)(global_context(),X,c)
 
-
-for (op, opensmt_func) in @compat Dict(:(-) => opensmt_mk_minus, :(/) => opensmt_mk_div)
+for (op, opensmt_func) in @compat Dict(:(-) => opensmt_mk_minus, :(/) => opensmt_mk_div, :(^) => opensmt_mk_pow)
   @eval ($op){T1<:Real, T2<:Real}(ctx::Context, x::Ex{T1}, y::Ex{T2}) =
     Ex{promote_type(T1,T2)}($opensmt_func(ctx.ctx,x.e,y.e))
 
@@ -97,7 +92,7 @@ end
 # Unary Real valued functions
 unaryrealop2opensmt = @compat Dict(
   :abs => opensmt_mk_abs, :exp => opensmt_mk_exp, :log => opensmt_mk_log,
-  :(^) => opensmt_mk_pow, :sin => opensmt_mk_sin, :cos => opensmt_mk_cos,
+  :sin => opensmt_mk_sin, :cos => opensmt_mk_cos,
   :tan => opensmt_mk_tan, :asin => opensmt_mk_asin, :acos => opensmt_mk_acos,
   :atan => opensmt_mk_pow, :sinh => opensmt_mk_sinh, :cosh => opensmt_mk_cosh,
   :tanh => opensmt_mk_tanh, :atan2 => opensmt_mk_atan2)
@@ -107,9 +102,8 @@ for (op,opensmt_func) in unaryrealop2opensmt
   @eval ($op){T<:Real}(x::Ex{T}) = ($op)(global_context(),x)
 end
 
-#TODO
-# ITE
-# AND OR
+sqrt{T<:Real}(ctx::Context, x::Ex{T}) = (^)(ctx,x,0.5)
+sqrt{T<:Real}(x::Ex{T}) = sqrt(global_context(),x)
 
 ## Logical Functions
 ## =================
@@ -169,13 +163,13 @@ is_satisfiable() = is_satisfiable(global_context())
 
 # @doc "Return a model from the solver" ->
 function model(ctx::Context, e::Ex{Float64})
-  !is_satisfiable(ctx) && error("Cannot get model from unsatisfiable model")
+  # !is_satisfiable(ctx) && error("Cannot get model from unsatisfiable model")
   Interval(opensmt_get_lb(ctx.ctx,e.e), opensmt_get_ub(ctx.ctx,e.e))
 end
 
 # @doc "Return a model from the solver" ->
 function model(ctx::Context, e::Ex{Bool})
-  !is_satisfiable(ctx) && error("Cannot get model from unsatisfiable model")
+  # !is_satisfiable(ctx) && error("Cannot get model from unsatisfiable model")
   sat = opensmt_get_bool(ctx.ctx, e.e)
   if sat == 1
     return true
@@ -187,17 +181,17 @@ function model(ctx::Context, e::Ex{Bool})
 end
 
 function model(ctx::Context, e::Ex{Int})
-  !is_satisfiable(ctx) && error("Cannot get model from unsatisfiable model")
+  # !is_satisfiable(ctx) && error("Cannot get model from unsatisfiable model")
   Interval(round(Int, opensmt_get_lb(ctx.ctx,e.e)), round(Int,opensmt_get_ub(ctx.ctx,e.e)))
 end
 
 function model{T}(ctx::Context, es::Array{Ex{T}})
-  !is_satisfiable(ctx) && error("Cannot get model from unsatisfiable model")
+  # !is_satisfiable(ctx) && error("Cannot get model from unsatisfiable model")
   map(e->model(ctx,e), es)
 end
 
 function model(ctx::Context, es::Ex...)
-  !is_satisfiable(ctx) && error("Cannot get model from unsatisfiable model")
+  # !is_satisfiable(ctx) && error("Cannot get model from unsatisfiable model")
   map(e->model(ctx,e), es)
 end
 
@@ -209,9 +203,12 @@ model(es::Ex...) = model(global_context(),es...)
 add!(ctx::Context, e::Ex{Bool}) = opensmt_assert(ctx.ctx, e.e)
 add!(e::Ex{Bool}) = add!(global_context(), e)
 
+@doc """push creates a new scope by saving the current stack size.
+  A `pop` following push will undo all assertions in between""" ->
 push_ctx!(ctx::Context) = opensmt_push(ctx.ctx)
 push_ctx!() = push_ctx!(global_context())
 
+@doc "Pop removes any assertion or declaration performed between it and the matching push." ->
 pop_ctx!(ctx::Context) = opensmt_pop(ctx.ctx)
 pop_ctx!() = pop_ctx!(global_context())
 

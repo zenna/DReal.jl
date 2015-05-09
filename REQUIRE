@@ -1,2 +1,4 @@
 julia 0.3-
 AbstractDomains 0.0.1
+BinDeps
+Docile
