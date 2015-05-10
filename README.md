@@ -124,6 +124,8 @@ __caution:__ the value of the cost function may be a declared variable.  The fol
 ```julia
 x = Var(Float64,"x",-5.12,5.12)
 y = Var(Float64,"y",-5.12,5.12)
+
 # we did not declare a value for the cost
+cost, assignment =  minimize(rastrigin([x,y]),x,y; lb=-10.,ub = 10.)
 ```
 

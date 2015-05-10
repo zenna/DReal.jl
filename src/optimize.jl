@@ -1,5 +1,5 @@
-@doc "Stop after 100 iterations" ->
-go_to_ten{T}(niters::Int, history::Vector{Interval{T}}) = niters < 10
+@doc "Stop after 10 iterations" ->
+go_to_ten{T}(i::Int, history::Vector{Interval{T}}) = i < 10
 
 @doc """Find values of `vars` such that `obj` is maximized or minimized.
   Assumes obj function is between `lb` and `ub`
@@ -17,37 +17,40 @@ function minimize{T<:Real}(ctx::Context, obj::Ex{T}, vars::Ex...;
                           lb::T = typemin(T),
                           ub::T = typemax(T),
                           dontstop::Function = go_to_ten)
-  # Check there exists some cost within specified bounds
   @assert lb < ub "lower bound not less than upper bound"
-  cost_bounds = Interval(lb,ub)
+  # Check its possible to get cost within specified bounds
   add!(ctx,(obj >= lb) & (obj <= ub))
   !is_satisfiable(ctx) && error("No model has objective value between $lb and $ub")
 
-
+  local cost_bounds = Interval(lb,ub) # Bounds optimal cost
   local cost # best cost seen so far
   local optimal_model # best model (of vars) seen so far
   local last_test_issat # wheter last test was satisfiable
-  history = Interval{T}[] # History of intervals which contain best cost
+  history = Interval{T}[] # record history of cost_bounds intervals
   i = 0
   while dontstop(i, history)
     i += 1
     push_ctx!(ctx)
+
+    # Test whether optimal cost is in upper or lower half of cost_bounds
     lhalf, uhalf = mid_split(cost_bounds)
     # current_lb, current_ub = uhalf.l, uhalf.u
     current_lb, current_ub = lhalf.l, lhalf.u
-    @show current_lb, current_ub
     add!(ctx,(obj >= current_lb) & (obj <= current_ub))
 
+    # if SAT, optimal cost is the lower half, split lower half next iteration 
     if is_satisfiable(ctx)
       last_test_issat = true
+
+      # Actually, we know that optimal cost must be less than the cost
+      # found from the last test. Use that as an upper bound for effiency
       amodel = model(ctx,obj,vars...)
       cost = amodel[1]
       optimal_model = amodel[2:end] 
-      @show cost, optimal_model
       # cost_bounds = Interval(cost.l, current_ub)
       cost_bounds = Interval(current_lb, cost.u)
     else
-      # println("UNSAT")
+      # Otherwise it must be in the upperhalf, split upper half next iteration
       last_test_issat = false
       # cost_bounds = lhalf
       cost_bounds = uhalf 
@@ -55,7 +58,6 @@ function minimize{T<:Real}(ctx::Context, obj::Ex{T}, vars::Ex...;
 
     push!(history, cost_bounds)
     pop_ctx!(ctx)
-    println("\n")
   end
 
   if last_test_issat
