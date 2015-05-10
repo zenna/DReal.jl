@@ -2,7 +2,8 @@ tests = ["ex1capi",
          "ex1",
          "ex2capi",
          "ex2",
-         "exintfloat"
+         "exintfloat",
+         "optimize"
          # "tutorial"
          ]
 
