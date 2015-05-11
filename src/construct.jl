@@ -27,14 +27,14 @@ boolop2opensmt = @compat Dict(:(=>) => opensmt_mk_geq, :(>) => opensmt_mk_gt,
 ## Real × Real -> Bool
 for (op,opensmt_func) in boolop2opensmt
   @eval ($op){T1<:Real, T2<:Real}(ctx::Context, x::Ex{T1}, y::Ex{T2}) = 
-    Ex{Bool}($opensmt_func(ctx.ctx,x.e,y.e))
+    Ex{Bool}($opensmt_func(ctx.ctx,x.e,y.e), union(x.vars,y.vars))
   # Var and constant c
   @eval ($op){T1<:Real, T2<:Real}(ctx::Context, x::Ex{T1}, c::T2) = 
-    Ex{Bool}($opensmt_func(ctx.ctx,x.e,convert(Ex{promote_type(T1,T2)},c)))
+    Ex{Bool}($opensmt_func(ctx.ctx,x.e,convert(Ex{promote_type(T1,T2)},c)),x.vars)
 
   # constant c and Var
   @eval ($op){T1<:Real, T2<:Real}(ctx::Context, c::T1, x::Ex{T2}) = 
-    Ex{Bool}($opensmt_func(ctx.ctx,convert(Ex{promote_type(T1,T2)},c),x.e))
+    Ex{Bool}($opensmt_func(ctx.ctx,convert(Ex{promote_type(T1,T2)},c),x.e),x.vars)
   
   # Default Contex
   @eval ($op){T1<:Real, T2<:Real}(x::Ex{T1}, y::Ex{T2}) = ($op)(global_context(), x, y)
@@ -43,20 +43,21 @@ for (op,opensmt_func) in boolop2opensmt
 end
 
 # To fix type ambiguity
-(^){T1<:Real,T2<:Integer}(ctx::Context, x::Ex{T1},c::T2) = Ex{promote_type(T1,T2)}(opensmt_mk_pow(ctx.ctx,x.e,convert(Ex{promote_type(T1,T2)},c)))
+(^){T1<:Real,T2<:Integer}(ctx::Context, x::Ex{T1},c::T2) =
+  Ex{promote_type(T1,T2)}(opensmt_mk_pow(ctx.ctx,x.e,convert(Ex{promote_type(T1,T2)},c)),x.vars)
 (^){T1<:Real,T2<:Integer}(X::Ex{T1},c::T2) = (^)(global_context(),X,c)
 
 for (op, opensmt_func) in @compat Dict(:(-) => opensmt_mk_minus, :(/) => opensmt_mk_div, :(^) => opensmt_mk_pow)
   @eval ($op){T1<:Real, T2<:Real}(ctx::Context, x::Ex{T1}, y::Ex{T2}) =
-    Ex{promote_type(T1,T2)}($opensmt_func(ctx.ctx,x.e,y.e))
+    Ex{promote_type(T1,T2)}($opensmt_func(ctx.ctx,x.e,y.e),union(x.vars,y.vars))
 
   # Var and constant c
   @eval ($op){T1<:Real, T2<:Real}(ctx::Context, x::Ex{T1}, c::T2) =
-    Ex{promote_type(T1,T2)}($opensmt_func(ctx.ctx,x.e,convert(Ex{promote_type(T1,T2)},c)))
+    Ex{promote_type(T1,T2)}($opensmt_func(ctx.ctx,x.e,convert(Ex{promote_type(T1,T2)},c)),x.vars)
 
   # constant c and Var
   @eval ($op){T1<:Real, T2<:Real}(ctx::Context, c::T2, x::Ex{T1}) =
-    Ex{promote_type(T1,T2)}($opensmt_func(ctx.ctx,convert(Ex{promote_type(T1,T2)},c), x.e))
+    Ex{promote_type(T1,T2)}($opensmt_func(ctx.ctx,convert(Ex{promote_type(T1,T2)},c), x.e),x.vars)
 
   # global context defaults
   @eval ($op){T1<:Real, T2<:Real}(x::Ex{T1}, y::Ex{T2}) =
@@ -70,15 +71,15 @@ end
 # + and - take variable number of args
 for (op, opensmt_func) in @compat Dict(:(+) => opensmt_mk_plus, :(*) => opensmt_mk_times)
   @eval ($op){T1<:Real, T2<:Real}(ctx::Context, x::Ex{T1}, y::Ex{T2}) =
-    Ex{promote_type(T1,T2)}($opensmt_func(ctx.ctx,[x.e,y.e],@compat UInt32(2)))
+    Ex{promote_type(T1,T2)}($opensmt_func(ctx.ctx,[x.e,y.e],@compat UInt32(2)),union(x.vars,y.vars))
 
   # Var and constant c
   @eval ($op){T1<:Real, T2<:Real}(ctx::Context, x::Ex{T1}, c::T2) =
-    Ex{promote_type(T1,T2)}($opensmt_func(ctx.ctx,[x.e,convert(Ex{promote_type(T1,T2)},c)], @compat UInt32(2)))
+    Ex{promote_type(T1,T2)}($opensmt_func(ctx.ctx,[x.e,convert(Ex{promote_type(T1,T2)},c)], @compat UInt32(2)),x.vars)
 
   # constant c and Var
   @eval ($op){T1<:Real, T2<:Real}(ctx::Context, c::T2, x::Ex{T1}, ) =
-    Ex{promote_type(T1,T2)}($opensmt_func(ctx.ctx,[convert(Ex{promote_type(T1,T2)},c), x.e], @compat UInt32(2)))
+    Ex{promote_type(T1,T2)}($opensmt_func(ctx.ctx,[convert(Ex{promote_type(T1,T2)},c), x.e], @compat UInt32(2)),x.vars)
 
   # global context defaults
   @eval ($op){T1<:Real, T2<:Real}(x::Ex{T1}, y::Ex{T2}) =
@@ -98,7 +99,7 @@ unaryrealop2opensmt = @compat Dict(
   :tanh => opensmt_mk_tanh, :atan2 => opensmt_mk_atan2)
 
 for (op,opensmt_func) in unaryrealop2opensmt
-  @eval ($op){T<:Real}(ctx::Context, x::Ex{T}) = Ex{Float64}($opensmt_func(ctx.ctx,x.e))
+  @eval ($op){T<:Real}(ctx::Context, x::Ex{T}) = Ex{Float64}($opensmt_func(ctx.ctx,x.e),x.vars)
   @eval ($op){T<:Real}(x::Ex{T}) = ($op)(global_context(),x)
 end
 
@@ -111,15 +112,15 @@ sqrt{T<:Real}(x::Ex{T}) = sqrt(global_context(),x)
 ## Bool × Bool -> Bool
 for (op,opensmt_func) in @compat Dict(:(&) => opensmt_mk_and, :(|) => opensmt_mk_or)
   @eval ($op)(ctx::Context, x::Ex{Bool}, y::Ex{Bool}) =
-    Ex{Bool}($opensmt_func(ctx.ctx,[x.e,y.e],@compat UInt32(2)))
+    Ex{Bool}($opensmt_func(ctx.ctx,[x.e,y.e],@compat UInt32(2)),union(x.vars,y.vars))
 
   # Var and constant c
   @eval ($op)(ctx::Context, x::Ex{Bool}, c::Bool) =
-    Ex{Bool}($opensmt_func(ctx.ctx,[x.e,convert(Ex{Bool},c)], @compat UInt32(2)))
+    Ex{Bool}($opensmt_func(ctx.ctx,[x.e,convert(Ex{Bool},c)], @compat UInt32(2)),x.vars)
 
   # constant c and Var
   @eval ($op)(ctx::Context, c::Bool, x::Ex{Bool}, ) =
-    Ex{Bool}($opensmt_func(ctx.ctx,[convert(Ex{Bool},c), x.e], @compat UInt32(2)))
+    Ex{Bool}($opensmt_func(ctx.ctx,[convert(Ex{Bool},c), x.e], @compat UInt32(2)),x.vars)
 
   # global context defaults
   @eval ($op)(x::Ex{Bool}, y::Ex{Bool}) =
@@ -138,10 +139,10 @@ implies{T1<:Union(Bool, Ex{Bool}), T2<:Union(Bool, Ex{Bool})}(x::T1, y::T2) =
 → = implies
 
 # Not
-(!)(ctx::Context, e::Ex{Bool}) = Ex{Bool}(opensmt_mk_not(ctx.ctx,e.e))
+(!)(ctx::Context, x::Ex{Bool}) = Ex{Bool}(opensmt_mk_not(ctx.ctx,x.e),x.vars)
 (!)(e::Ex{Bool}) = !(global_context(),e)
 
-ifelse{T}(ctx::Context, a::Ex{Bool}, b::Ex{T}, c::Ex{T}) = Ex{T}(opensmt_mk_ite(ctx.ctx, a.e, b.e, c.e))
+ifelse{T}(ctx::Context, a::Ex{Bool}, b::Ex{T}, c::Ex{T}) = Ex{T}(opensmt_mk_ite(ctx.ctx, a.e, b.e, c.e),union(a.vars,b.vars,c.vars))
 ifelse{T}(a::Ex{Bool}, b::Ex{T}, c::Ex{T}) = ifelse(global_context(),a,b,c)
 
 ## Queries
@@ -200,7 +201,7 @@ model{T}(es::Array{Ex{T}}) = model(global_context(),es)
 model(es::Ex...) = model(global_context(),es...)
 
 # @doc "Add (assert) a constraint to the solver" ->
-add!(ctx::Context, e::Ex{Bool}) = opensmt_assert(ctx.ctx, e.e)
+add!(ctx::Context, e::Ex{Bool}) = (opensmt_assert(ctx.ctx, e.e); add_vars!(ctx,e.vars))
 add!(e::Ex{Bool}) = add!(global_context(), e)
 
 @doc """push creates a new scope by saving the current stack size.
