@@ -23,7 +23,7 @@ import Base:  abs, exp, log,
               ^, sin, cos,
               tan, asin, acos,
               atan, sinh, cosh,
-              tanh, atan2
+              tanh, atan2, sqrt
 
 export
   Context,

@@ -203,23 +203,3 @@ model(es::Ex...) = model(global_context(),es...)
 # @doc "Add (assert) a constraint to the solver" ->
 add!(ctx::Context, e::Ex{Bool}) = (opensmt_assert(ctx.ctx, e.e); add_vars!(ctx,e.vars))
 add!(e::Ex{Bool}) = add!(global_context(), e)
-
-@doc """push creates a new scope by saving the current stack size.
-  A `pop` following push will undo all assertions in between""" ->
-push_ctx!(ctx::Context) = opensmt_push(ctx.ctx)
-push_ctx!() = push_ctx!(global_context())
-
-@doc "Pop removes any assertion or declaration performed between it and the matching push." ->
-pop_ctx!(ctx::Context) = opensmt_pop(ctx.ctx)
-pop_ctx!() = pop_ctx!(global_context())
-
-reset_ctx!(ctx::Context) = opensmt_reset(ctx.ctx)
-reset_ctx!() = reset_ctx!(global_context())
-
-delete_ctx!(ctx::Context) = opensmt_del_context(ctx.ctx)
-delete_ctx!() = delete_ctx!(global_context())
-
-function reset_global_ctx!(l::Logic = qf_nra)
-  delete_ctx!(global_context())
-  create_global_ctx!(l)
-end
