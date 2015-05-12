@@ -33,6 +33,7 @@ export
   set_precision!,
   init_dreal!,
   Var,
+  Ex,
   add!,
   is_satisfiable,
   global_context,
