@@ -37,7 +37,7 @@ opensmt_pop(ctx::opensmt_context) =
 
 opensmt_pop(ctx::opensmt_context) = 
   ccall( (:opensmt_pop, "libdreal"), Void, (Ptr{Void},), ctx)
-
+  
 opensmt_assert(ctx::opensmt_context, e::opensmt_expr) = 
   ccall((:opensmt_assert, "libdreal"), Void,
     (Ptr{Void}, Ptr{Void}), ctx, e)
@@ -130,6 +130,10 @@ opensmt_mk_ite(ctx::opensmt_context, e1::opensmt_expr, e2::opensmt_expr, e3::ope
 opensmt_mk_not(ctx::opensmt_context, e::opensmt_expr) =
   ccall((:opensmt_mk_not, "libdreal"), Ptr{Void},
         (Ptr{Void}, Ptr{Void}), ctx, e)
+
+opensmt_mk_num(ctx::opensmt_context, c::Float64) =
+  ccall((:opensmt_mk_num, "libdreal"), Ptr{Void},
+        (Ptr{Void}, Float64), ctx, c)
 
 opensmt_mk_num_from_string(ctx::opensmt_context, c::ASCIIString) =
   ccall((:opensmt_mk_num_from_string, "libdreal"), Ptr{Void},

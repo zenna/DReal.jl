@@ -6,7 +6,7 @@
 import Base: convert, push!
 
 convert{T1<:Real, T2<:Real}(::Type{Ex{T1}}, ctx::Context, x::T2) =
-  opensmt_mk_num_from_string(ctx.ctx, string(convert(T1,x)))
+  opensmt_mk_num(ctx.ctx,x)
 convert{T<:Real}(::Type{Ex{T}},x::Ex{T}) = x # This seems redundant!
 convert{T1<:Real, T2<:Real}(t::Type{Ex{T1}}, x::T2) = convert(t,global_context(),x)
 
