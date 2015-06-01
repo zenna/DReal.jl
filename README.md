@@ -9,12 +9,12 @@ dReal also allows you to do non-linear, constrained, optimisation.
 
 # Prerequisites
 
- - [dReal](https://github.com/dreal/dreal3) (with shared library installed): [Visit the release page of dReal](https://github.com/dreal/dreal3/releases), [download the latest shared libraries](https://github.com/dreal/dreal3/releases/download/v3.15.05.01/dReal-3.15.05.01-linux-shared-libs.tar.gz), and set up `LD_LIBRARY_PATH` environment variable.
+ - [dReal](https://github.com/dreal/dreal3) (with shared library installed): [Visit the release page of dReal](https://github.com/dreal/dreal3/releases), [download the latest shared libraries](https://github.com/dreal/dreal3/releases/download/v3.15.05.02/dReal-3.15.05.02-linux-shared-libs.tar.gz), and set up `LD_LIBRARY_PATH` environment variable.
 
     ```bash
-    wget https://github.com/dreal/dreal3/releases/download/v3.15.05.01/dReal-3.15.05.01-linux-shared-libs.tar.gz
-    tar xvfz dReal-3.15.05.01-linux-shared-libs.tar.gz
-    cd dReal-3.15.05.01-linux/lib
+    wget https://github.com/dreal/dreal3/releases/download/v3.15.05.02/dReal-3.15.05.02-linux-shared-libs.tar.gz
+    tar xvfz dReal-3.15.05.02-linux-shared-libs.tar.gz
+    cd dReal-3.15.05.02-linux/lib
     export LD_LIBRARY_PATH=`pwd`
     ```
  - libstdc++6: In Ubuntu, please do the following install to install it.
