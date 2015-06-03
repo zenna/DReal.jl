@@ -2,6 +2,7 @@ using dReal
 
 import dReal: init_dreal!, Context, Var, add!, set_precision!, is_satisfiable, model
 
+begin
 # Blank slate
 reset_ctx!()
 
@@ -17,4 +18,5 @@ res = is_satisfiable(ctx)
 if res
   println("x = $(model(ctx,x))")
   println("y = $(model(ctx,y))")
+end
 end

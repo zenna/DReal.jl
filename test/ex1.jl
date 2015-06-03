@@ -1,6 +1,7 @@
 using dReal
 using Base.Test
 
+begin
 # Blank slate
 reset_ctx!()
 
@@ -67,3 +68,4 @@ reset_ctx!()
 
 # # Deleting context
 # delete_ctx!()
+end

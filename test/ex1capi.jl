@@ -5,6 +5,7 @@ import dReal: opensmt_context, opensmt_set_verbosity, opensmt_assert, opensmt_ch
 using Base.Test
 using Compat
 
+begin
 # Blank slate
 reset_ctx!()
 
@@ -135,3 +136,4 @@ opensmt_reset( ctx )
 # # Deleting context
 # print( "Deleting context\n" )
 # opensmt_del_context( ctx )
+end

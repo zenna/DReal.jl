@@ -19,7 +19,7 @@ using Base.Test
 # add!(sin(x) - y <= 0.3)
 # @test is_satisfiable()
 # @show model(x,y)
-
+begin
 reset_global_ctx!()
 
 x = Var(Float64, "x", -10.0, 10.0)
@@ -28,3 +28,4 @@ z = Var(Float64, "z", 0.0, 10.0)
 add!(x-y>z)
 @show is_satisfiable()
 @show model(x,y,z)
+end

@@ -6,7 +6,7 @@
 import Base: convert, push!
 
 convert{T1<:Real, T2<:Real}(::Type{Ex{T1}}, ctx::Context, x::T2) =
-  opensmt_mk_num(ctx.ctx,x)
+  opensmt_mk_num(ctx.ctx,convert(Float64,x))
 convert{T<:Real}(::Type{Ex{T}},x::Ex{T}) = x # This seems redundant!
 convert{T1<:Real, T2<:Real}(t::Type{Ex{T1}}, x::T2) = convert(t,global_context(),x)
 
@@ -89,6 +89,12 @@ for (op, opensmt_func) in @compat Dict(:(+) => opensmt_mk_plus, :(*) => opensmt_
   @eval ($op){T1<:Real, T2<:Real}(c::T2, x::Ex{T1}) =
     ($op)(global_context(),c,x)
 end
+
+# Unary plus and minus
+(-)(X::Ex) = 0 - X
+(+)(X::Ex) = 0 + X
+(-)(ctx::Context,X::Ex) = (-)(ctx,0,X)
+(+)(ctx::Context,X::Ex) = (+)(ctx,0,X)
 
 # Unary Real valued functions
 unaryrealop2opensmt = @compat Dict(

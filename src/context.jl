@@ -13,7 +13,7 @@ add_vars!(ctx::Context, v::ASCIIString) = push!(ctx.vars,v)
 
 create_global_ctx!(l::Logic = qf_nra) = 
   (global default_global_context; default_global_context = Context(l))
-# create_global_ctx!( )
+create_global_ctx!( )
 global_context() = (global default_global_context; default_global_context)
 
 @doc """push creates a new scope by saving the current stack size.
@@ -25,7 +25,7 @@ push_ctx!() = push_ctx!(global_context())
 pop_ctx!(ctx::Context) = opensmt_pop(ctx.ctx)
 pop_ctx!() = pop_ctx!(global_context())
 
-reset_ctx!(ctx::Context) = opensmt_reset(ctx.ctx)
+reset_ctx!(ctx::Context) = (opensmt_reset(ctx.ctx);ctx.vars = Set{ASCIIString}())
 reset_ctx!() = reset_ctx!(global_context())
 
 delete_ctx!(ctx::Context) = opensmt_del_context(ctx.ctx)

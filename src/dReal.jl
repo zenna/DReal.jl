@@ -6,11 +6,11 @@ using Compat
 VERSION < v"0.4-" && using Docile
 
 try
+  @compat Libdl.dlopen("libibex.so", Libdl.RTLD_LAZY|Libdl.RTLD_DEEPBIND|Libdl.RTLD_GLOBAL)
   @compat Libdl.dlopen("libprim.so", Libdl.RTLD_LAZY|Libdl.RTLD_DEEPBIND|Libdl.RTLD_GLOBAL)
   @compat Libdl.dlopen("libClp.so", Libdl.RTLD_LAZY|Libdl.RTLD_DEEPBIND|Libdl.RTLD_GLOBAL)
-  @compat Libdl.dlopen("libibex.so", Libdl.RTLD_LAZY|Libdl.RTLD_DEEPBIND|Libdl.RTLD_GLOBAL)
   @compat Libdl.dlopen("libcapd.so", Libdl.RTLD_LAZY|Libdl.RTLD_DEEPBIND|Libdl.RTLD_GLOBAL)
-  @compat Libdl.dlopen("libglog.so", Libdl.RTLD_LAZY|Libdl.RTLD_DEEPBIND|Libdl.RTLD_GLOBAL)
+  # @compat Libdl.dlopen("libglog.so", Libdl.RTLD_LAZY|Libdl.RTLD_DEEPBIND|Libdl.RTLD_GLOBAL)
   @compat Libdl.dlopen("libdreal.so", Libdl.RTLD_LAZY|Libdl.RTLD_DEEPBIND|Libdl.RTLD_GLOBAL)
 catch e
   println("Could not load required shared libraries")
@@ -23,6 +23,8 @@ import Base:  abs, exp, log,
               tan, asin, acos,
               atan, sinh, cosh,
               tanh, atan2, sqrt
+
+import Base: ifelse
 
 export
   Context,
@@ -44,7 +46,8 @@ export
   reset_global_ctx!,
   →,
   implies,
-  minimize
+  minimize,
+  default_global_context
 
 
 include("wrap_capi.jl")

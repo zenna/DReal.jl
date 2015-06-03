@@ -6,6 +6,7 @@ import dReal:  opensmt_init, opensmt_mk_context,
                opensmt_mk_sin, opensmt_mk_cos, opensmt_get_ub, opensmt_get_lb,
                opensmt_set_precision
 
+begin
 # Blank slate
 reset_ctx!()
 
@@ -27,4 +28,5 @@ if res == 1
   y_ub = opensmt_get_ub(ctx, y)
   y_lb = opensmt_get_lb(ctx, y)
   println("y = [$y_lb, $y_ub]")
+end
 end
