@@ -25,6 +25,7 @@ import Base:  abs, exp, log,
               tanh, atan2, sqrt
 
 import Base: ifelse
+import Base: convert, push!
 
 export
   Context,

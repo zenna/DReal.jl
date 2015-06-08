@@ -4,6 +4,8 @@ immutable Ex{T}
   vars::Set{ASCIIString}
 end
 
+no_vars() = Set{ASCIIString}()
+
 ## TODO
 ## Check that lb <= ub
 function safe_add!(name::ASCIIString, ctx::Context)

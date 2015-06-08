@@ -3,23 +3,24 @@
 
 ## Conversion
 ## ==========
-import Base: convert, push!
 
-convert{T1<:Real, T2<:Real}(::Type{Ex{T1}}, ctx::Context, x::T2) =
-  opensmt_mk_num(ctx.ctx,convert(Float64,x))
-convert{T<:Real}(::Type{Ex{T}},x::Ex{T}) = x # This seems redundant!
-convert{T1<:Real, T2<:Real}(t::Type{Ex{T1}}, x::T2) = convert(t,global_context(),x)
+function convert{T1<:Real, T2<:Real}(ctx::Context, ::Type{Ex{T1}}, x::T2)
+  # mk_num only supports Float64, so we'll convert to that but keep the ex type
+  Ex{T1}(opensmt_mk_num(ctx.ctx, Float64(T1(x))), no_vars())
+end
+convert{T<:Real}(::Type{Ex{T}}, x::Ex{T}) = x # This seems redundant!
+convert{T1<:Real, T2<:Real}(t::Type{Ex{T1}}, x::T2) = convert(global_context(), t, x)
 
 # Bool expressions
-convert(::Type{Ex{Bool}}, ctx::Context, x::Bool) =
-  if x opensmt_mk_true(ctx.ctx) else opensmt_mk_false(ctx.ctx) end
+function convert(ctx::Context, ::Type{Ex{Bool}}, x::Bool) 
+  x ? Ex{Bool}(opensmt_mk_true(ctx.ctx), no_vars()) :
+      Ex{Bool}(opensmt_mk_false(ctx.ctx), no_vars())
+end
 
-convert(::Type{Ex{Bool}}, x::Bool) =
-  convert(Ex{Bool}, global_context(), x)
+convert(::Type{Ex{Bool}}, x::Bool) = convert(global_context(), Ex{Bool}, x)
 
 ## Arithmetic
 ## ==========
-
 boolop2opensmt = @compat Dict(:(>=) => opensmt_mk_geq, :(>) => opensmt_mk_gt,
                               :(<=) => opensmt_mk_leq, :(<) => opensmt_mk_lt,
                               :(==) => opensmt_mk_eq)
@@ -30,11 +31,11 @@ for (op,opensmt_func) in boolop2opensmt
     Ex{Bool}($opensmt_func(ctx.ctx,x.e,y.e), union(x.vars,y.vars))
   # Var and constant c
   @eval ($op){T1<:Real, T2<:Real}(ctx::Context, x::Ex{T1}, c::T2) = 
-    Ex{Bool}($opensmt_func(ctx.ctx,x.e,convert(Ex{promote_type(T1,T2)},ctx,c)),x.vars)
+    Ex{Bool}($opensmt_func(ctx.ctx,x.e,convert(ctx, Ex{promote_type(T1,T2)},c).e)  ,x.vars)
 
   # constant c and Var
   @eval ($op){T1<:Real, T2<:Real}(ctx::Context, c::T1, x::Ex{T2}) = 
-    Ex{Bool}($opensmt_func(ctx.ctx,convert(Ex{promote_type(T1,T2)},ctx,c),x.e),x.vars)
+    Ex{Bool}($opensmt_func(ctx.ctx,convert(ctx, Ex{promote_type(T1,T2)},c).e, x.e),x.vars)
   
   # Default Contex
   @eval ($op){T1<:Real, T2<:Real}(x::Ex{T1}, y::Ex{T2}) = ($op)(global_context(), x, y)
@@ -44,7 +45,7 @@ end
 
 # To fix type ambiguity
 (^){T1<:Real,T2<:Integer}(ctx::Context, x::Ex{T1},c::T2) =
-  Ex{promote_type(T1,T2)}(opensmt_mk_pow(ctx.ctx,x.e,convert(Ex{promote_type(T1,T2)},ctx,c)),x.vars)
+  Ex{promote_type(T1,T2)}(opensmt_mk_pow(ctx.ctx,x.e,convert(ctx,Ex{promote_type(T1,T2)},c)).e, x.vars)
 (^){T1<:Real,T2<:Integer}(X::Ex{T1},c::T2) = (^)(global_context(),X,c)
 
 for (op, opensmt_func) in @compat Dict(:(-) => opensmt_mk_minus, :(/) => opensmt_mk_div, :(^) => opensmt_mk_pow)
@@ -53,11 +54,11 @@ for (op, opensmt_func) in @compat Dict(:(-) => opensmt_mk_minus, :(/) => opensmt
 
   # Var and constant c
   @eval ($op){T1<:Real, T2<:Real}(ctx::Context, x::Ex{T1}, c::T2) =
-    Ex{promote_type(T1,T2)}($opensmt_func(ctx.ctx,x.e,convert(Ex{promote_type(T1,T2)},ctx,c)),x.vars)
+    Ex{promote_type(T1,T2)}($opensmt_func(ctx.ctx,x.e,convert(ctx, Ex{promote_type(T1,T2)},c).e), x.vars)
 
   # constant c and Var
   @eval ($op){T1<:Real, T2<:Real}(ctx::Context, c::T2, x::Ex{T1}) =
-    Ex{promote_type(T1,T2)}($opensmt_func(ctx.ctx,convert(Ex{promote_type(T1,T2)},ctx,c), x.e),x.vars)
+    Ex{promote_type(T1,T2)}($opensmt_func(ctx.ctx,convert(ctx, Ex{promote_type(T1,T2)},c).e, x.e),x.vars)
 
   # global context defaults
   @eval ($op){T1<:Real, T2<:Real}(x::Ex{T1}, y::Ex{T2}) =
@@ -75,11 +76,11 @@ for (op, opensmt_func) in @compat Dict(:(+) => opensmt_mk_plus, :(*) => opensmt_
 
   # Var and constant c
   @eval ($op){T1<:Real, T2<:Real}(ctx::Context, x::Ex{T1}, c::T2) =
-    Ex{promote_type(T1,T2)}($opensmt_func(ctx.ctx,[x.e,convert(Ex{promote_type(T1,T2)},ctx,c)], @compat UInt32(2)),x.vars)
+    Ex{promote_type(T1,T2)}($opensmt_func(ctx.ctx,[x.e,convert(ctx, Ex{promote_type(T1,T2)},c).e], @compat UInt32(2)),x.vars)
 
   # constant c and Var
   @eval ($op){T1<:Real, T2<:Real}(ctx::Context, c::T2, x::Ex{T1}, ) =
-    Ex{promote_type(T1,T2)}($opensmt_func(ctx.ctx,[convert(Ex{promote_type(T1,T2)},ctx,c), x.e], @compat UInt32(2)),x.vars)
+    Ex{promote_type(T1,T2)}($opensmt_func(ctx.ctx,[convert(ctx, Ex{promote_type(T1,T2)},c).e, x.e], @compat UInt32(2)),x.vars)
 
   # global context defaults
   @eval ($op){T1<:Real, T2<:Real}(x::Ex{T1}, y::Ex{T2}) =
@@ -122,11 +123,11 @@ for (op,opensmt_func) in @compat Dict(:(&) => opensmt_mk_and, :(|) => opensmt_mk
 
   # Var and constant c
   @eval ($op)(ctx::Context, x::Ex{Bool}, c::Bool) =
-    Ex{Bool}($opensmt_func(ctx.ctx,[x.e,convert(Ex{Bool},ctx,c)], @compat UInt32(2)),x.vars)
+    Ex{Bool}($opensmt_func(ctx.ctx,[x.e,convert(ctx, Ex{Bool}, c).e], @compat UInt32(2)),x.vars)
 
   # constant c and Var
   @eval ($op)(ctx::Context, c::Bool, x::Ex{Bool}, ) =
-    Ex{Bool}($opensmt_func(ctx.ctx,[convert(Ex{Bool},ctx,c), x.e], @compat UInt32(2)),x.vars)
+    Ex{Bool}($opensmt_func(ctx.ctx,[convert(ctx, Ex{Bool},c).e, x.e], @compat UInt32(2)),x.vars)
 
   # global context defaults
   @eval ($op)(x::Ex{Bool}, y::Ex{Bool}) =
@@ -148,8 +149,11 @@ implies{T1<:Union(Bool, Ex{Bool}), T2<:Union(Bool, Ex{Bool})}(x::T1, y::T2) =
 (!)(ctx::Context, x::Ex{Bool}) = Ex{Bool}(opensmt_mk_not(ctx.ctx,x.e),x.vars)
 (!)(e::Ex{Bool}) = !(global_context(),e)
 
-ifelse{T}(ctx::Context, a::Ex{Bool}, b::Ex{T}, c::Ex{T}) = Ex{T}(opensmt_mk_ite(ctx.ctx, a.e, b.e, c.e),union(a.vars,b.vars,c.vars))
-ifelse{T}(a::Ex{Bool}, b::Ex{T}, c::Ex{T}) = ifelse(global_context(),a,b,c)
+ifelse{T<:Real}(ctx::Context, a::Ex{Bool}, b::Ex{T}, c::Ex{T}) = Ex{T}(opensmt_mk_ite(ctx.ctx, a.e, b.e, c.e),union(a.vars,b.vars,c.vars))
+ifelse{T<:Real}(ctx::Context, a::Ex{Bool}, b::T, c::T) = ifelse(ctx,a,convert(ctx, Ex{T}, b),convert(ctx, Ex{T}, c))
+ifelse{T<:Real}(ctx::Context, b::Ex{T}, c::T) = ifelse(ctx,a,b,convert(ctx, Ex{T}, c))
+ifelse{T<:Real}(ctx::Context, b::T, c::Ex{T}) = ifelse(ctx,a,convert(ctx, Ex{T}, b), c)
+ifelse(a::Ex{Bool}, b, c) = ifelse(global_context(),a,b,c)
 
 ## Queries
 ## =======
@@ -192,7 +196,7 @@ function model(ctx::Context, e::Ex{Int})
   Interval(round(Int, opensmt_get_lb(ctx.ctx,e.e)), round(Int,opensmt_get_ub(ctx.ctx,e.e)))
 end
 
-function model{T}(ctx::Context, es::Array{Ex{T}})
+function model{T}(ctx::Context, es::Array{Ex{T}}) 
   !is_satisfiable(ctx) && error("Cannot get model from unsatisfiable model")
   map(e->model(ctx,e), es)
 end
