@@ -45,7 +45,7 @@ end
 
 # To fix type ambiguity
 (^){T1<:Real,T2<:Integer}(ctx::Context, x::Ex{T1},c::T2) =
-  Ex{promote_type(T1,T2)}(opensmt_mk_pow(ctx.ctx,x.e,convert(ctx,Ex{promote_type(T1,T2)},c)).e, x.vars)
+  Ex{promote_type(T1,T2)}(opensmt_mk_pow(ctx.ctx, x.e, convert(ctx, Ex{promote_type(T1,T2)},c).e), x.vars)
 (^){T1<:Real,T2<:Integer}(X::Ex{T1},c::T2) = (^)(global_context(),X,c)
 
 for (op, opensmt_func) in @compat Dict(:(-) => opensmt_mk_minus, :(/) => opensmt_mk_div, :(^) => opensmt_mk_pow)
