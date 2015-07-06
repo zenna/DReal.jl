@@ -1,5 +1,5 @@
 # Check for memory leaks
-using dReal
+using DReal
 ctx = Context(qf_nra)
 X = Var(ctx, Float64,"X", 0.0,1.0)
 for i = 1:10000

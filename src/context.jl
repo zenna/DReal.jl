@@ -1,4 +1,4 @@
-# @doc """A dReal context manages all other dReal objects, global configuration options, etc.
+# @doc """A DReal context manages all other DReal objects, global configuration options, etc.
 #     Objects created in one context cannot be used in another one.""" ->
 type Context
   ctx::Ptr{Void}

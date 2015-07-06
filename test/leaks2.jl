@@ -1,4 +1,4 @@
-using dReal
+using DReal
 
 ctx = Context(qf_nra)
 X = Var(ctx, Float64,"X", 0.0,1.0)

@@ -166,7 +166,7 @@ function is_satisfiable(ctx::Context)
   elseif sat == -1
     return false
   else 
-    error("Could not determine satisfiability, dReal returned $sat")
+    error("Could not determine satisfiability, DReal returned $sat")
   end
 end
 

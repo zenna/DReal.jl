@@ -1,6 +1,6 @@
-using dReal
+using DReal
 
-import dReal: init_dreal!, Context, Var, add!, set_precision!, is_satisfiable, model
+import DReal: init_dreal!, Context, Var, add!, set_precision!, is_satisfiable, model
 
 begin
 # Blank slate

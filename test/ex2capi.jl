@@ -1,7 +1,7 @@
-using dReal
+using DReal
 using Base.Test
 
-import dReal:  opensmt_init, opensmt_mk_context,
+import DReal:  opensmt_init, opensmt_mk_context,
                opensmt_mk_real_var, opensmt_mk_eq, opensmt_assert, opensmt_check,
                opensmt_mk_sin, opensmt_mk_cos, opensmt_get_ub, opensmt_get_lb,
                opensmt_set_precision

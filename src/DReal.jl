@@ -1,4 +1,4 @@
-module dReal
+module DReal
 
 using AbstractDomains
 using Compat

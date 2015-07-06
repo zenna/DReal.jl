@@ -1,4 +1,4 @@
-# @doc "a dReal typed Expression" ->
+# @doc "a DReal typed Expression" ->
 immutable Ex{T}
   e::Ptr{Void}
   vars::Set{ASCIIString}

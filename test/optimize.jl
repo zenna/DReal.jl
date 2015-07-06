@@ -1,4 +1,4 @@
-using dReal
+using DReal
 using Base.Test
 
 # Ackley's: bounds -5 <= x,y <= 5, min: f(0,0) = 0

@@ -1,5 +1,5 @@
-using dReal
-import dReal: opensmt_context, opensmt_set_verbosity, opensmt_assert, opensmt_check, opensmt_print_expr, opensmt_mk_context,
+using DReal
+import DReal: opensmt_context, opensmt_set_verbosity, opensmt_assert, opensmt_check, opensmt_print_expr, opensmt_mk_context,
               opensmt_mk_bool_var, opensmt_mk_int_var, opensmt_mk_minus, opensmt_mk_leq, opensmt_mk_num_from_string,
               opensmt_push, opensmt_pop, opensmt_reset, opensmt_del_context
 using Base.Test

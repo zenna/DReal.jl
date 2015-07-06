@@ -1,4 +1,4 @@
-using dReal
+using DReal
 using Base.Test
 a = Var(Bool,"a")
 b = Var(Bool,"b")
