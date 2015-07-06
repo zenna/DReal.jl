@@ -61,7 +61,7 @@ function minimize{T<:Real}(ctx::Context, obj::Ex{T}, vars::Ex...;
   end
 
   if last_test_issat
-    return cost, optimal_mod
+    return cost, optimal_model
   else
     # If the last test returns UNSAT, we do not know what the best cost is
     # But we do have a best interval which must contain it

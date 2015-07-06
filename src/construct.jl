@@ -6,7 +6,7 @@
 
 function convert{T1<:Real, T2<:Real}(ctx::Context, ::Type{Ex{T1}}, x::T2)
   # mk_num only supports Float64, so we'll convert to that but keep the ex type
-  Ex{T1}(opensmt_mk_num(ctx.ctx, Float64(T1(x))), no_vars())
+  @compat Ex{T1}(opensmt_mk_num(ctx.ctx, Float64(convert(T1,x))), no_vars())
 end
 convert{T<:Real}(::Type{Ex{T}}, x::Ex{T}) = x # This seems redundant!
 convert{T1<:Real, T2<:Real}(t::Type{Ex{T1}}, x::T2) = convert(global_context(), t, x)
@@ -31,7 +31,7 @@ for (op,opensmt_func) in boolop2opensmt
     Ex{Bool}($opensmt_func(ctx.ctx,x.e,y.e), union(x.vars,y.vars))
   # Var and constant c
   @eval ($op){T1<:Real, T2<:Real}(ctx::Context, x::Ex{T1}, c::T2) = 
-    Ex{Bool}($opensmt_func(ctx.ctx,x.e,convert(ctx, Ex{promote_type(T1,T2)},c).e)  ,x.vars)
+    Ex{Bool}($opensmt_func(ctx.ctx,x.e,convert(ctx, Ex{promote_type(T1,T2)},c).e), x.vars)
 
   # constant c and Var
   @eval ($op){T1<:Real, T2<:Real}(ctx::Context, c::T1, x::Ex{T2}) = 

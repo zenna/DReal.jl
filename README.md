@@ -123,7 +123,7 @@ prints:
 > the assignment of x=[0.0 0.0] and y=[0.0 0.0] minimises rastrigin to [0.0 -0.0]
 ```
 
-__caution:__ the value of the cost function may be a declared variable.  The following code may produce wrong or erratic results
+__caution:__ the value of the cost function must be a declared variable.  The following code may produce wrong or erratic results
 
 ```julia
 x = Var(Float64,"x",-5.12,5.12)
