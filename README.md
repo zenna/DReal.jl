@@ -34,6 +34,7 @@ DReal.jl is not yet in the official Julia Package repository.  You can still eas
 
 ```julia
 Pkg.clone("https://github.com/dreal/DReal.jl.git")
+Pkg.build("DReal")
 ```
 
 dReal can then be loaded with:
