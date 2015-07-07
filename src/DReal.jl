@@ -3,6 +3,15 @@ module DReal
 using AbstractDomains
 using Compat
 
+@windows_only error("Windows not supported")
+
+# @show joinpath(dirname(@__FILE__),"..","deps","deps.jl")
+# if isfile(joinpath(dirname(@__FILE__),"..","deps","deps.jl"))
+#     include("../deps/deps.jl")
+# else
+#     error("DReal not properly installed. Please run Pkg.build(\"DReal\")")
+# end
+
 VERSION < v"0.4-" && using Docile
 
 try

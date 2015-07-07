@@ -9,7 +9,7 @@ x = Var(Float64,"x2",-5.12,5.12)
 y = Var(Float64,"y2",-5.12,5.12)
 f = Var(Float64,"f2",-10.,10.)
 add!(f == ackleys([x,y]))
-cost, model = minimize(f,x,y; lb=-10.,ub = 10.)
+cost, optimal_model = minimize(f,x,y; lb=-10.,ub = 10.)
 
 reset_ctx!(default_global_context)
 
@@ -22,8 +22,8 @@ x = Var(Float64,"x3",-5.12,5.12)
 y = Var(Float64,"y3",-5.12,5.12)
 f = Var(Float64,"f3",-10.,10.)
 add!(f == beale([x,y]))
-cost, model = minimize(f,x,y; lb=-10.,ub = 10.)
-@show cost, model
+cost, optimal_model = minimize(f,x,y; lb=-10.,ub = 10.)
+@show cost, optimal_model
 
 reset_global_ctx!()
 
@@ -35,8 +35,8 @@ x = Var(Float64,"x4",-5.12,5.12)
 y = Var(Float64,"y4",-5.12,5.12)
 f = Var(Float64,"f4",-10.,10.)
 add!(f == rastrigin([x,y]))
-cost, model = minimize(f,x,y; lb=-10.,ub = 10.)
-@show cost, model
+cost, optimal_model = minimize(f,x,y; lb=-10.,ub = 10.)
+@show cost, optimal_model
 
 reset_global_ctx!()
 

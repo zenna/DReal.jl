@@ -3,8 +3,14 @@ tests = ["ex1capi",
          "ex2capi",
          "ex2",
          "exintfloat",
-         "optimize"
-         # "tutorial"
+         "optimize",
+         "sat",
+         "expop",
+         "expop2",
+         "ifelse",
+         "leak",
+         "leaks2",
+         "leaks4"
          ]
 
 println("Running tests:")

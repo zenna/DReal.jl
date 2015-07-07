@@ -1,0 +1,16 @@
+using DReal
+reset_ctx!()
+
+a = Var(Float64,"aexpop",0.,1.)
+b2 = (a < 0.1) | (a > 0.9)
+push_ctx!()
+add!(a>0.0)
+add!(a<1.0)
+add!(b2)
+is_satisfiable()
+pop_ctx!()
+push_ctx!()
+add!(a>0.0)
+add!(a<1.0)
+add!(!b2)
+is_satisfiable()
