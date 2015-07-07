@@ -1,6 +1,6 @@
 # DReal.jl
 
-[![Build Status](https://travis-ci.org/dreal/dReal.jl.svg?branch=master)](https://travis-ci.org/dreal/dReal.jl)
+[![Build Status](https://travis-ci.org/dreal/DReal.jl.svg?branch=master)](https://travis-ci.org/dreal/DReal.jl)
 
 This is a Julia wrapper for the [dReal SMT solver](https://dreal.github.io/).
 dReal allows you to answer [satisfiability problems](http://en.wikipedia.org/wiki/Satisfiability_modulo_theories).  That is, you can ask questions of the form: __is there some assignment to my variables `x1`,`x2`,`x3`,..., that makes my formula over these variables true?__.
@@ -30,16 +30,16 @@ dReal also allows you to do non-linear, constrained, optimisation.
     ```
 
 # Installation
-dReal.jl is not yet in the official Julia Package repository.  You can still easily install it from a Julia repl with
+DReal.jl is not yet in the official Julia Package repository.  You can still easily install it from a Julia repl with
 
 ```julia
-Pkg.clone("https://github.com/dreal/dReal.jl.git")
+Pkg.clone("https://github.com/dreal/DReal.jl.git")
 ```
 
 dReal can then be loaded with:
 
 ```julia
-using dReal
+using DReal
 ```
 
 # Getting Started
@@ -47,7 +47,7 @@ using dReal
 To ask is there some Integer `x` and some Integer `y` such that `x > 2` and `y < 10` and `x + 2*y ==7`, y ou could write:
 
 ```julia
-using dReal
+using DReal
 x = Var(Int,"x")
 y = Var(Int,"y")
 add!((x > 2) & (y < 10) & (x + 2*y == 7))
@@ -102,7 +102,7 @@ model(p,q,r)
 
 # Optimisation
 
-dReal.jl has tools for constrained optimisation.  One strength of optimisation in dReal is that the constraints and the objective function can be non-linear or discontinous.  The function `minimize(obj::Ex,vars::Ex...)` takes as input a value `obj` to to be minimised, and any variables `vars` whose optimal values you would like to get.  It returns a `Tuple` (a pair) of the optimal cost and corresponding values of the vars you specified.
+DReal.jl has tools for constrained optimisation.  One strength of optimisation in dReal is that the constraints and the objective function can be non-linear or discontinous.  The function `minimize(obj::Ex,vars::Ex...)` takes as input a value `obj` to to be minimised, and any variables `vars` whose optimal values you would like to get.  It returns a `Tuple` (a pair) of the optimal cost and corresponding values of the vars you specified.
 
 As an example we can minimize the [rastrigins function](http://en.wikipedia.org/wiki/Rastrigin_function), which takes vector `x` of reals, each between -5.12 and 5.12  as input, and has a global minimum at `x = 0`, of 0.
 
