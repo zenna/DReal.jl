@@ -37,6 +37,18 @@ Var(ctx::Context, T::Type) = Var(ctx, T, genvar())
 Var{R<:Real}(T::Type, lb::R, ub::R) = Var(T, genvar(), lb, ub)
 Var(T::Type) = Var(T, genvar())
 
+ForallVar(ctx::Context, T::Type{Float64}, lb::Float64, ub::Float64; name::ASCIIString = genvar()) =
+  (safe_add!(name, ctx); Ex{T}(opensmt_mk_forall_real_var(ctx.ctx, name, lb, ub), Set([name])))
+
+ForallVar(ctx::Context, T::Type{Float64}; name::ASCIIString = genvar()) =
+  (safe_add!(name, ctx); Ex{T}(opensmt_mk_forall_unbounded_real_var(ctx.ctx, name), Set([name])))
+
+ForallVar(ctx::Context, T::Type{Int64}, lb::Int64, ub::Int64; name::ASCIIString = genvar()) =
+  (safe_add!(name, ctx); Ex{T}(opensmt_mk_forall_int_var(ctx.ctx, name, lb, ub), Set([name])))
+
+ForallVar(ctx::Context, T::Type{Int64}; name::ASCIIString = genvar()) =
+  (safe_add!(name, ctx); Ex{T}(opensmt_mk_forall_int_var(ctx.ctx, name, typemin(Int), typemax(Int)), Set([name])))
+
 ## Printing
 ## ========
 print(io::IO, e::Ex) = opensmt_print_expr(e.e)

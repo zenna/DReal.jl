@@ -106,6 +106,30 @@ opensmt_mk_int_var(ctx::opensmt_context, varname::ASCIIString, lb::Int64, ub::In
   ccall((:opensmt_mk_int_var, "libdreal"), Ptr{Void},
         (Ptr{Void}, Ptr{UInt8}, Int64, Int64), ctx, varname, lb, ub)
 
+opensmt_mk_unbounded_int_var(ctx::opensmt_context, varname::ASCIIString) =
+  ccall((:opensmt_mk_unbounded_int_var, "libdreal"), Ptr{Void},
+        (Ptr{Void}, Ptr{UInt8}), ctx, varname)
+
+opensmt_mk_forall_int_var(ctx::opensmt_context, varname::ASCIIString, lb::Int64, ub::Int64) =
+  ccall((:opensmt_mk_forall_int_var, "libdreal"), Ptr{Void},
+        (Ptr{Void}, Ptr{UInt8}, Int64, Int64), ctx, varname, lb, ub)
+
+opensmt_mk_forall_unbounded_int_var(ctx::opensmt_context, varname::ASCIIString) =
+  ccall((:opensmt_mk_forall_unbounded_int_var, "libdreal"), Ptr{Void},
+        (Ptr{Void}, Ptr{UInt8}), ctx, varname)
+
+opensmt_mk_unbounded_real_var(ctx::opensmt_context, varname::ASCIIString) =
+  ccall((:opensmt_mk_unbounded_real_var, "libdreal"), Ptr{Void},
+        (Ptr{Void}, Ptr{UInt8}), ctx, varname)
+
+opensmt_mk_forall_real_var(ctx::opensmt_context, varname::ASCIIString, lb::Float64, ub::Float64) =
+  ccall((:opensmt_mk_forall_real_var, "libdreal"), Ptr{Void},
+        (Ptr{Void}, Ptr{UInt8}, Float64, Float64), ctx, varname, lb, ub)
+
+opensmt_mk_forall_unbounded_real_var(ctx::opensmt_context, varname::ASCIIString) =
+  ccall((:opensmt_mk_forall_real_var, "libdreal"), Ptr{Void},
+        (Ptr{Void}, Ptr{UInt8}), ctx, varname)
+
 opensmt_mk_cost_var(ctx::opensmt_context, varname::Ptr{UInt8}) =
   ccall((:opensmt_mk_cost_var, "libdreal"), Ptr{Void}, (Ptr{Void}, Ptr{UInt8}), ctx, varname)
 
