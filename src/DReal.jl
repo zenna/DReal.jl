@@ -14,12 +14,18 @@ using Compat
 
 VERSION < v"0.4-" && using Docile
 
+deps_dir = joinpath(joinpath(Pkg.dir("DReal"),"deps"))
+prefix = joinpath(deps_dir,"usr")
+src_dir = joinpath(prefix,"src")
+bin_dir = joinpath(prefix,"bin")
+lib_dir = joinpath(prefix,"lib")
+
 try
-  @compat Libdl.dlopen("libibex.so", Libdl.RTLD_LAZY|Libdl.RTLD_DEEPBIND|Libdl.RTLD_GLOBAL)
-  @compat Libdl.dlopen("libprim.so", Libdl.RTLD_LAZY|Libdl.RTLD_DEEPBIND|Libdl.RTLD_GLOBAL)
-  @compat Libdl.dlopen("libClp.so", Libdl.RTLD_LAZY|Libdl.RTLD_DEEPBIND|Libdl.RTLD_GLOBAL)
-  @compat Libdl.dlopen("libcapd.so", Libdl.RTLD_LAZY|Libdl.RTLD_DEEPBIND|Libdl.RTLD_GLOBAL)
-  @compat Libdl.dlopen("libdreal.so", Libdl.RTLD_LAZY|Libdl.RTLD_DEEPBIND|Libdl.RTLD_GLOBAL)
+  @compat Libdl.dlopen(joinpath(lib_dir, "libibex.so"), Libdl.RTLD_LAZY|Libdl.RTLD_DEEPBIND|Libdl.RTLD_GLOBAL)
+  @compat Libdl.dlopen(joinpath(lib_dir, "libprim.so"), Libdl.RTLD_LAZY|Libdl.RTLD_DEEPBIND|Libdl.RTLD_GLOBAL)
+  @compat Libdl.dlopen(joinpath(lib_dir, "libClp.so"), Libdl.RTLD_LAZY|Libdl.RTLD_DEEPBIND|Libdl.RTLD_GLOBAL)
+  @compat Libdl.dlopen(joinpath(lib_dir, "libcapd.so"), Libdl.RTLD_LAZY|Libdl.RTLD_DEEPBIND|Libdl.RTLD_GLOBAL)
+  @compat Libdl.dlopen(joinpath(lib_dir, "libdreal.so"), Libdl.RTLD_LAZY|Libdl.RTLD_DEEPBIND|Libdl.RTLD_GLOBAL)
 catch e
   println("Could not load required shared libraries")
   rethrow(e)
