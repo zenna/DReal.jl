@@ -51,6 +51,7 @@ export
   set_precision!,
   init_dreal!,
   Var,
+  ForallVar,
   Ex,
   add!,
   is_satisfiable,
