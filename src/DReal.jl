@@ -2,6 +2,7 @@ module DReal
 
 using AbstractDomains
 using Compat
+using MathProgBase
 
 @windows_only error("Windows not supported")
 
@@ -65,6 +66,8 @@ export
   minimize,
   default_global_context
 
+## Global defaults
+const DEFAULT_PRECISION = 0.001
 
 include("wrap_capi.jl")
 # Julia 0.3 does not have enums
@@ -78,6 +81,10 @@ include("environment.jl")
 include("expression.jl")
 include("construct.jl")
 include("optimize.jl")
+include("SolverInterface.jl")
+include("util.jl")
+
+
 
 
 export
@@ -95,4 +102,6 @@ export
   qf_ct          # Cost
 
 init_dreal!()
+create_global_ctx!()
+
 end

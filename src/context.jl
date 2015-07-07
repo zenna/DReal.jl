@@ -13,8 +13,12 @@ add_vars!(ctx::Context, v::ASCIIString) = push!(ctx.vars,v)
 
 create_global_ctx!(l::Logic = qf_nra) = 
   (global default_global_context; default_global_context = Context(l))
-create_global_ctx!( )
 global_context() = (global default_global_context; default_global_context)
+
+function set_global_ctx!(ctx::Context)
+  global default_global_context
+  default_global_context = ctx
+end
 
 @doc """push creates a new scope by saving the current stack size.
   A `pop` following push will undo all assertions in between""" ->
