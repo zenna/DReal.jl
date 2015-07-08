@@ -174,13 +174,13 @@ is_satisfiable() = is_satisfiable(global_context())
 
 # @doc "Return a model from the solver" ->
 function model(ctx::Context, e::Ex{Float64})
-  !is_satisfiable(ctx) && error("Cannot get model from unsatisfiable model")
+  # !is_satisfiable(ctx) && error("Cannot get model from unsatisfiable model")
   Interval(opensmt_get_lb(ctx.ctx,e.e), opensmt_get_ub(ctx.ctx,e.e))
 end
 
 # @doc "Return a model from the solver" ->
 function model(ctx::Context, e::Ex{Bool})
-  !is_satisfiable(ctx) && error("Cannot get model from unsatisfiable model")
+  # !is_satisfiable(ctx) && error("Cannot get model from unsatisfiable model")
   sat = opensmt_get_bool(ctx.ctx, e.e)
   if sat == 1
     return true
@@ -192,17 +192,17 @@ function model(ctx::Context, e::Ex{Bool})
 end
 
 function model(ctx::Context, e::Ex{Int})
-  !is_satisfiable(ctx) && error("Cannot get model from unsatisfiable model")
+  # !is_satisfiable(ctx) && error("Cannot get model from unsatisfiable model")
   Interval(round(Int, opensmt_get_lb(ctx.ctx,e.e)), round(Int,opensmt_get_ub(ctx.ctx,e.e)))
 end
 
 function model{T}(ctx::Context, es::Array{Ex{T}}) 
-  !is_satisfiable(ctx) && error("Cannot get model from unsatisfiable model")
+  # !is_satisfiable(ctx) && error("Cannot get model from unsatisfiable model")
   map(e->model(ctx,e), es)
 end
 
 function model(ctx::Context, es::Ex...)
-  !is_satisfiable(ctx) && error("Cannot get model from unsatisfiable model")
+  # !is_satisfiable(ctx) && error("Cannot get model from unsatisfiable model")
   map(e->model(ctx,e), es)
 end
 

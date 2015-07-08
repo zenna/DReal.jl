@@ -1,4 +1,5 @@
-file_url = "https://github.com/dreal/dreal3/releases/download/v3.15.06.02/dReal-3.15.06.02-linux-shared-libs.tar.gz"
+version = "3.15.07.01"
+file_url = "https://github.com/dreal/dreal3/releases/download/v$version/dReal-$version-linux-shared-libs.tar.gz"
 deps_dir = joinpath(joinpath(Pkg.dir("DReal"),"deps"))
 prefix = joinpath(deps_dir,"usr")
 
@@ -12,9 +13,10 @@ try
   run(`rm -r $(joinpath(deps_dir,"usr"))`)
 catch end
 
-download(file_url,joinpath(deps_dir,"dReal-3.15.06.02-linux-shared-libs.tar.gz"))
-run(`tar -xvf dReal-3.15.06.02-linux-shared-libs.tar.gz`)
-run(`mv $(joinpath(deps_dir, "dReal-3.15.06.02-linux")) usr`)
+
+download(file_url,joinpath(deps_dir,"dReal-$version-linux-shared-libs.tar.gz"))
+run(`tar -xvf dReal-$version-linux-shared-libs.tar.gz`)
+run(`mv $(joinpath(deps_dir, "dReal-$version-linux-shared-libs")) usr`)
 
 # using BinDeps
 # using Compat
