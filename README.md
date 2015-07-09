@@ -8,6 +8,7 @@ dReal allows you to answer [satisfiability problems](http://en.wikipedia.org/wik
 dReal also allows you to do non-linear, constrained, optimisation.
 
 # Prerequisites
+ - Linux: DReal does not yet support Windows or OSX
  - libstdc++6: In Ubuntu, please do the following install to install it.
 
     ```bash
@@ -17,14 +18,14 @@ dReal also allows you to do non-linear, constrained, optimisation.
     ```
 
 # Installation
-DReal.jl is not yet in the official Julia Package repository.  You can still easily install it from a Julia repl with
+You can still easily install it from a Julia repl with
 
 ```julia
-Pkg.clone("https://github.com/dreal/DReal.jl.git")
-Pkg.build("DReal")
+Pkg.update()
+Pkg.add("DReal")
 ```
 
-dReal can then be loaded with:
+DReal can then be loaded with:
 
 ```julia
 using DReal
