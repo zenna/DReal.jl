@@ -83,19 +83,22 @@ function loadnonlinearproblem!(m::DRealMathProgModel,
   (sense == :Min || sense == :Max) || error("Unrecognized sense $sense")
   @assert length(x_l) == length(x_u) == numVar
 
-  cost_var = DReal.Var(m.ctx, Float64, -1000.00, 1000.00)
+  cost_var = Var(m.ctx, Float64, -100.00, 100.00)
+  @show x_l
+  @show x_u
   vars = [Var(m.ctx, Float64, x_l[i], x_u[i]) for i = 1:numVar]
   
-  m.cost_var = cost_var
   m.vars = vars
+  @show obj_expr(d)
   add!(m.ctx, cost_var == eval(Expr(:let, obj_expr(d), :(x=$vars))))
+  m.cost_var = cost_var
   m.sense = sense
   m.numvar = length(vars)
 end
 
 # @doc "Solves the optimization problem" ->
 function optimize!(m::DRealMathProgModel)
-  @show cost, optimal_model = minimize(m.ctx, m.cost_var, m.vars...; lb = -1000.0, ub = 10000.0)
+  @show cost, optimal_model = minimize(m.ctx, m.cost_var, m.vars...; lb = -10000.0, ub = 10000.0)
   m.status = :Optimal
   m.objbound = cost
   opt_sols_vec = Interval[optimal_model...]
