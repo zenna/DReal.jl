@@ -90,6 +90,7 @@ function loadnonlinearproblem!(m::DRealMathProgModel,
   
   m.vars = vars
   @show obj_expr(d)
+  push_ctx!(m.ctx)
   add!(m.ctx, cost_var == eval(Expr(:let, obj_expr(d), :(x=$vars))))
   m.cost_var = cost_var
   m.sense = sense
@@ -99,6 +100,7 @@ end
 # @doc "Solves the optimization problem" ->
 function optimize!(m::DRealMathProgModel)
   @show cost, optimal_model = minimize(m.ctx, m.cost_var, m.vars...; lb = -10000.0, ub = 10000.0)
+  pop_ctx!(m.ctx)
   m.status = :Optimal
   m.objbound = cost
   opt_sols_vec = Interval[optimal_model...]
