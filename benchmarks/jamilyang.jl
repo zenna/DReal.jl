@@ -1,6 +1,10 @@
+## Optimisation Benchmarks from Jamil, Yang 2013
+## =============================================
+
 using DynamicAnalysis
 import DynamicAnalysis: benchmark
 
+using Lens
 using MathProgBase
 using JuMP
 using DReal
@@ -8,7 +12,6 @@ using NLopt
 
 e_ = convert(Float64, e)
 pi_ = convert(Float64, π)
-
 
 type OptProb <: Problem
   n::Int
@@ -21,24 +24,14 @@ end
 
 type OptAlgo <: Algorithm
   solver::MathProgBase.MathProgSolverInterface.AbstractMathProgSolver
+  capture::Vector{Symbol}
 end
 
+# Benchmark an algorithm against a optimization problem
 function benchmark(a::OptAlgo, p::OptProb)
-  # @show "1"
-  # m = Model(solver = a.solver)
-  # # Declare variables
-  # @show "2"
-  # bounds_expr = Expr(:comparison, p.lb, :(<=), Expr(:ref, :x, Expr(:(:), 1, p.n)), :(<=), p.ub)
-  # var_expr = Expr(:macrocall, symbol("@defVar"), :m, bounds_expr)
-  # eval(var_expr)
-  # @show "3"
-  # obj_expr = Expr(:macrocall, symbol("@setNLObjective"), :m, QuoteNode(:Min), p.obj)
-  # n = p.n
-  # @show "4"
-  # eval(obj_expr)
-  # solve(m)
-  # @show "5"
   eval(gen_f(a,p))
+  value, results = capture(()->eval(gen_f(a,p)), a.capture)
+  results
 end
 
 function gen_f(a::OptAlgo, p::OptProb)
@@ -48,18 +41,16 @@ function gen_f(a::OptAlgo, p::OptProb)
     @defVar(m, $(p.lb) <= x[1:$(p.n)] <= $(p.ub))
     @setNLObjective(m, :Min , $(p.obj))
     @time solve(m)
-    @show getObjectiveValue(m)
+    @show obj_val = getObjectiveValue(m)
+    lens(:objective_val, obj_val)  
   end
 end
 
-
 ## Algorithms
 ## ==========
-dreal = OptAlgo(DRealSolver(precision = 0.001))
-mma = OptAlgo(NLoptSolver(algorithm=:LD_MMA))
-cobyla = OptAlgo(NLoptSolver(algorithm=:LN_COBYLA))
-
-## Hard Optimisation Benchmarks from Jamil, Yang 2013
+dreal = OptAlgo(DRealSolver(precision = 0.001), [:objective_val])
+mma = OptAlgo(NLoptSolver(algorithm=:LD_MMA), [:objective_val])
+cobyla = OptAlgo(NLoptSolver(algorithm=:LN_COBYLA), [:objective_val])
 
 ## Problems
 ## ========
@@ -98,8 +89,14 @@ brown = OptProb(4, -4.0, 4.0, :Min,
 ripple = OptProb(2, 0.0, 1.0, :Min, :(sum{x[i]^(2*x[i+1]^2+1) + x[i+1]^(2*x[i]^2+1), i=1:n-1}), -Inf)
 whitley = OptProb(5, -100.0, 100.0, :Min, :(sum{((100*(x[i]^2 -x[j])^2 + (1 - x[j])^2)^2)/4000 - cos(100*(x[i]^2 - x[j])^2 + (1 - x[j])^2) + 1, i = 1:n, j = 1:n}), -1.)
 
+## Run Experiments
+problems = [ackley1, ackley2, ackley3, ackley4, alpine7, beale10, biggs11, brown, ripple, whitley]
+algos = [dreal, cobyla]
+
+@show record(algos,problems; runname = "kl",savedb=false,exceptions=true)
+
 ## 171. Xin-She
-xinshe171 = OptProb(5, -10.0, 10.0, :Min, :(exp(-sum{(x[i]/15)^(2*5), i=1:n}) - 2*exp(-sum{x[i]^2, i=1:n}), -1.0)
+# xinshe171 = OptProb(5, -10.0, 10.0, :Min, :(exp(-sum{(x[i]/15)^(2*5), i=1:n}) - 2*exp(-sum{x[i]^2, i=1:n}), -1.0)
 
 
 # ## 25. Brown Function
