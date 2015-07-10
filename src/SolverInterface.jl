@@ -99,8 +99,14 @@ end
 
 # @doc "Solves the optimization problem" ->
 function optimize!(m::DRealMathProgModel)
-  @show cost, optimal_model = minimize(m.ctx, m.cost_var, m.vars...; lb = -10000.0, ub = 10000.0)
-  reset_global_ctx!()
+  local cost
+  local optimal_model
+  try
+    @show cost, optimal_model = minimize(m.ctx, m.cost_var, m.vars...; lb = -100.0, ub = 100.0)
+  catch e
+    reset_global_ctx!()
+    rethrow(e)
+  end
   m.status = :Optimal
   m.objbound = cost
   opt_sols_vec = Interval[optimal_model...]
