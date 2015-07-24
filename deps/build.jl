@@ -16,8 +16,8 @@ catch end
 
 download(file_url,joinpath(deps_dir,"dReal-$version-$os_string-shared-libs.tar.gz"))
 @osx? begin
-	run(pipe(`gunzip -c dReal-$version-$os_string-shared-libs.tar.gz`, `tar -xv`))
+  run(`unzip dReal-$version-$os_string-shared-libs.zip`))
 end : begin
-	run(`tar -xvf dReal-$version-$os_string-shared-libs.tar.gz`)
+  run(`tar -xvf dReal-$version-$os_string-shared-libs.tar.gz`)
 end
 run(`mv $(joinpath(deps_dir, "dReal-$version-$os_string-shared-libs")) usr`)
