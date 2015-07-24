@@ -1,4 +1,4 @@
-version = "3.15.07.01"
+version = "3.15.07.02"
 os_string = @osx? "darwin" : "linux"
 file_url = "https://github.com/dreal/dreal3/releases/download/v$version/dReal-$version-$os_string-shared-libs.tar.gz"
 deps_dir = joinpath(joinpath(Pkg.dir("DReal"),"deps"))
