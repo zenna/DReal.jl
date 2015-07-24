@@ -8,7 +8,7 @@ dReal allows you to answer [satisfiability problems](http://en.wikipedia.org/wik
 dReal also allows you to do non-linear, constrained, optimisation.
 
 # Prerequisites
- - Linux: DReal does not yet support Windows or OSX
+ - Linux or OSX: DReal does not support Windows
  - libstdc++6: In Ubuntu, please do the following install to install it.
 
     ```bash
@@ -18,7 +18,7 @@ dReal also allows you to do non-linear, constrained, optimisation.
     ```
 
 # Installation
-You can still easily install it from a Julia repl with
+You can easily install DReal from a Julia repl with
 
 ```julia
 Pkg.update()
@@ -90,7 +90,7 @@ a,b =  model(a,b)
 
 # Universal Quantification with `ForAll`
 
-DReal supports combinations of universal and existential quantification.  A universally quantified variable is created using `ForallVar` instead of `Var`.  For example, we can use `Forall` to do a synthesize a simple function.  The following example looks for a binary function `f` in a function space (parameterised by a variable `d`) such that for all inputs `x` and `y`, f(x,y) is greater than `5.0`.
+DReal has experimental support for combinations of universal and existential quantification.  A universally quantified variable is created using `ForallVar` instead of `Var`.  For example, we can use `Forall` to do a synthesize a simple function.  The following example looks for a binary function `f` in a function space (parameterised by a variable `d`) such that for all inputs `x` and `y`, f(x,y) is greater than `5.0`.
 
 ```julia
 using DReal
@@ -155,7 +155,7 @@ m = Model(solver=DReal.DRealSolver(precision = 0.001))
 @defVar(m, -10 <= x2 <= 10.0 )        # Lower bound only (note: 'lb <= x' is not valid)
 
 @setNLObjective(m, :Min, -1 * ((cos(x1)*cos(x2)*exp(sqrt(1 - (sqrt(x1^2 + x2^2)) / 3.141592)))^2) / 30)
-  
+
 status = solve(m)
 
 println("Objective value: ", getObjectiveValue(m))
