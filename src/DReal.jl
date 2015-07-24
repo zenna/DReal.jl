@@ -22,12 +22,16 @@ bin_dir = joinpath(prefix,"bin")
 lib_dir = joinpath(prefix,"lib")
 
 try
-  @compat Libdl.dlopen(joinpath(lib_dir, "libprim.so"), Libdl.RTLD_LAZY|Libdl.RTLD_DEEPBIND|Libdl.RTLD_GLOBAL)
-  @compat Libdl.dlopen(joinpath(lib_dir, "libCoinUtils.so"), Libdl.RTLD_LAZY|Libdl.RTLD_DEEPBIND|Libdl.RTLD_GLOBAL)
-  @compat Libdl.dlopen(joinpath(lib_dir, "libClp.so"), Libdl.RTLD_LAZY|Libdl.RTLD_DEEPBIND|Libdl.RTLD_GLOBAL)
-  @compat Libdl.dlopen(joinpath(lib_dir, "libcapd.so"), Libdl.RTLD_LAZY|Libdl.RTLD_DEEPBIND|Libdl.RTLD_GLOBAL)
-  @compat Libdl.dlopen(joinpath(lib_dir, "libibex.so"), Libdl.RTLD_LAZY|Libdl.RTLD_DEEPBIND|Libdl.RTLD_GLOBAL)
-  @compat Libdl.dlopen(joinpath(lib_dir, "libdreal.so"), Libdl.RTLD_LAZY|Libdl.RTLD_DEEPBIND|Libdl.RTLD_GLOBAL)
+  @osx? begin
+    @compat Libdl.dlopen(joinpath(lib_dir, "libdreal.dylib"), Libdl.RTLD_LAZY|Libdl.RTLD_DEEPBIND|Libdl.RTLD_GLOBAL)
+  end : begin
+    @compat Libdl.dlopen(joinpath(lib_dir, "libprim.so"), Libdl.RTLD_LAZY|Libdl.RTLD_DEEPBIND|Libdl.RTLD_GLOBAL)
+    @compat Libdl.dlopen(joinpath(lib_dir, "libCoinUtils.so"), Libdl.RTLD_LAZY|Libdl.RTLD_DEEPBIND|Libdl.RTLD_GLOBAL)
+    @compat Libdl.dlopen(joinpath(lib_dir, "libClp.so"), Libdl.RTLD_LAZY|Libdl.RTLD_DEEPBIND|Libdl.RTLD_GLOBAL)
+    @compat Libdl.dlopen(joinpath(lib_dir, "libcapd.so"), Libdl.RTLD_LAZY|Libdl.RTLD_DEEPBIND|Libdl.RTLD_GLOBAL)
+    @compat Libdl.dlopen(joinpath(lib_dir, "libibex.so"), Libdl.RTLD_LAZY|Libdl.RTLD_DEEPBIND|Libdl.RTLD_GLOBAL)
+    @compat Libdl.dlopen(joinpath(lib_dir, "libdreal.so"), Libdl.RTLD_LAZY|Libdl.RTLD_DEEPBIND|Libdl.RTLD_GLOBAL)
+  end
 catch e
   println("Could not load required shared libraries")
   rethrow(e)
