@@ -1,5 +1,8 @@
 version = "3.15.07.01"
-file_url = "https://github.com/dreal/dreal3/releases/download/v$version/dReal-$version-linux-shared-libs.tar.gz"
+@unix_only os = linux
+@osx_only os = darwin
+
+file_url = "https://github.com/dreal/dreal3/releases/download/v$version/dReal-$version-$os-shared-libs.tar.gz"
 deps_dir = joinpath(joinpath(Pkg.dir("DReal"),"deps"))
 prefix = joinpath(deps_dir,"usr")
 
@@ -14,9 +17,9 @@ try
 catch end
 
 
-download(file_url,joinpath(deps_dir,"dReal-$version-linux-shared-libs.tar.gz"))
-run(`tar -xvf dReal-$version-linux-shared-libs.tar.gz`)
-run(`mv $(joinpath(deps_dir, "dReal-$version-linux-shared-libs")) usr`)
+download(file_url,joinpath(deps_dir,"dReal-$version-$os-shared-libs.tar.gz"))
+run(`tar -xvf dReal-$version-$os-shared-libs.tar.gz`)
+run(`mv $(joinpath(deps_dir, "dReal-$version-$os-shared-libs")) usr`)
 
 # using BinDeps
 # using Compat
