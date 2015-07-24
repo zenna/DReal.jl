@@ -74,12 +74,7 @@ export
 const DEFAULT_PRECISION = 0.001
 
 include("wrap_capi.jl")
-# Julia 0.3 does not have enums
-if VERSION >= v"0.4.0-dev"
-  include("logic.jl")
-else
-  include("logicv3.jl")
-end
+include("logic.jl")
 include("context.jl")
 include("environment.jl")
 include("expression.jl")
