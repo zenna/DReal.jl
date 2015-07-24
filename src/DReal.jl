@@ -22,8 +22,9 @@ bin_dir = joinpath(prefix,"bin")
 lib_dir = joinpath(prefix,"lib")
 
 try
-  @osx_only @compat Libdl.dlopen(joinpath(lib_dir, "libprim.so"), Libdl.RTLD_LAZY|Libdl.RTLD_DEEPBIND|Libdl.RTLD_GLOBAL)
-  @linux_only begin
+  @osx? begin
+    @compat Libdl.dlopen(joinpath(lib_dir, "libdreal.dylib"), Libdl.RTLD_LAZY|Libdl.RTLD_DEEPBIND|Libdl.RTLD_GLOBAL)
+  end : begin
     @compat Libdl.dlopen(joinpath(lib_dir, "libprim.so"), Libdl.RTLD_LAZY|Libdl.RTLD_DEEPBIND|Libdl.RTLD_GLOBAL)
     @compat Libdl.dlopen(joinpath(lib_dir, "libCoinUtils.so"), Libdl.RTLD_LAZY|Libdl.RTLD_DEEPBIND|Libdl.RTLD_GLOBAL)
     @compat Libdl.dlopen(joinpath(lib_dir, "libClp.so"), Libdl.RTLD_LAZY|Libdl.RTLD_DEEPBIND|Libdl.RTLD_GLOBAL)
