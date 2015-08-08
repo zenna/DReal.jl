@@ -12,7 +12,7 @@ convert{T<:Real}(::Type{Ex{T}}, x::Ex{T}) = x # This seems redundant!
 convert{T1<:Real, T2<:Real}(t::Type{Ex{T1}}, x::T2) = convert(global_context(), t, x)
 
 # Bool expressions
-function convert(ctx::Context, ::Type{Ex{Bool}}, x::Bool) 
+function convert(ctx::Context, ::Type{Ex{Bool}}, x::Bool)
   x ? Ex{Bool}(opensmt_mk_true(ctx.ctx), no_vars()) :
       Ex{Bool}(opensmt_mk_false(ctx.ctx), no_vars())
 end
@@ -27,16 +27,16 @@ boolop2opensmt = @compat Dict(:(>=) => opensmt_mk_geq, :(>) => opensmt_mk_gt,
 
 ## Real × Real -> Bool
 for (op,opensmt_func) in boolop2opensmt
-  @eval ($op){T1<:Real, T2<:Real}(ctx::Context, x::Ex{T1}, y::Ex{T2}) = 
+  @eval ($op){T1<:Real, T2<:Real}(ctx::Context, x::Ex{T1}, y::Ex{T2}) =
     Ex{Bool}($opensmt_func(ctx.ctx,x.e,y.e), union(x.vars,y.vars))
   # Var and constant c
-  @eval ($op){T1<:Real, T2<:Real}(ctx::Context, x::Ex{T1}, c::T2) = 
+  @eval ($op){T1<:Real, T2<:Real}(ctx::Context, x::Ex{T1}, c::T2) =
     Ex{Bool}($opensmt_func(ctx.ctx,x.e,convert(ctx, Ex{promote_type(T1,T2)},c).e), x.vars)
 
   # constant c and Var
-  @eval ($op){T1<:Real, T2<:Real}(ctx::Context, c::T1, x::Ex{T2}) = 
+  @eval ($op){T1<:Real, T2<:Real}(ctx::Context, c::T1, x::Ex{T2}) =
     Ex{Bool}($opensmt_func(ctx.ctx,convert(ctx, Ex{promote_type(T1,T2)},c).e, x.e),x.vars)
-  
+
   # Default Contex
   @eval ($op){T1<:Real, T2<:Real}(x::Ex{T1}, y::Ex{T2}) = ($op)(global_context(), x, y)
   @eval ($op){T1<:Real, T2<:Real}(x::Ex{T1}, c::T2) = ($op)(global_context(), x, c)
@@ -139,7 +139,7 @@ for (op,opensmt_func) in @compat Dict(:(&) => opensmt_mk_and, :(|) => opensmt_mk
 end
 
 # Implication
-implies{T1<:Union(Bool, Ex{Bool}), T2<:Union(Bool, Ex{Bool})}(ctx::Context, x::T1, y::T2) = 
+implies{T1<:Union(Bool, Ex{Bool}), T2<:Union(Bool, Ex{Bool})}(ctx::Context, x::T1, y::T2) =
   (|)(ctx, (!)(ctx,x), y)
 implies{T1<:Union(Bool, Ex{Bool}), T2<:Union(Bool, Ex{Bool})}(x::T1, y::T2) =
   implies(global_context(),x,y)
@@ -151,8 +151,8 @@ implies{T1<:Union(Bool, Ex{Bool}), T2<:Union(Bool, Ex{Bool})}(x::T1, y::T2) =
 
 ifelse{T<:Real}(ctx::Context, a::Ex{Bool}, b::Ex{T}, c::Ex{T}) = Ex{T}(opensmt_mk_ite(ctx.ctx, a.e, b.e, c.e),union(a.vars,b.vars,c.vars))
 ifelse{T<:Real}(ctx::Context, a::Ex{Bool}, b::T, c::T) = ifelse(ctx,a,convert(ctx, Ex{T}, b),convert(ctx, Ex{T}, c))
-ifelse{T<:Real}(ctx::Context, b::Ex{T}, c::T) = ifelse(ctx,a,b,convert(ctx, Ex{T}, c))
-ifelse{T<:Real}(ctx::Context, b::T, c::Ex{T}) = ifelse(ctx,a,convert(ctx, Ex{T}, b), c)
+ifelse{T<:Real}(ctx::Context, a::Ex{Bool}, b::Ex{T}, c::T) = ifelse(ctx,a,b,convert(ctx, Ex{T}, c))
+ifelse{T<:Real}(ctx::Context, a::Ex{Bool}, b::T, c::Ex{T}) = ifelse(ctx,a,convert(ctx, Ex{T}, b), c)
 ifelse(a::Ex{Bool}, b, c) = ifelse(global_context(),a,b,c)
 
 ## Queries
@@ -165,7 +165,7 @@ function is_satisfiable(ctx::Context)
     return true
   elseif sat == -1
     return false
-  else 
+  else
     error("Could not determine satisfiability, DReal returned $sat")
   end
 end
@@ -186,7 +186,7 @@ function model(ctx::Context, e::Ex{Bool})
     return true
   elseif sat == -1
     return false
-  else 
+  else
     error("Unknown Boolean Value")
   end
 end
@@ -196,7 +196,7 @@ function model(ctx::Context, e::Ex{Int})
   Interval(round(Int, opensmt_get_lb(ctx.ctx,e.e)), round(Int,opensmt_get_ub(ctx.ctx,e.e)))
 end
 
-function model{T}(ctx::Context, es::Array{Ex{T}}) 
+function model{T}(ctx::Context, es::Array{Ex{T}})
   !is_satisfiable(ctx) && error("Cannot get model from unsatisfiable model")
   map(e->model(ctx,e), es)
 end
