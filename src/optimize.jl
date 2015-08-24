@@ -1,9 +1,9 @@
-@doc "Stop after 10 iterations" ->
+"Stop after 10 iterations"
 go_to_ten{T}(i::Int, history::Vector{Interval{T}}) = i < 10
 
-@doc """Find values of `vars` such that `obj` is maximized or minimized.
+"""Find values of `vars` such that `obj` is maximized or minimized.
   Assumes obj function is between `lb` and `ub`
-  
+
   Optimizes by solving series questions of the form:
   Is there some model such that `cost` < `x`
   Uses binary search to efficiently find smallest `x` where the answer is true
@@ -12,7 +12,7 @@ go_to_ten{T}(i::Int, history::Vector{Interval{T}}) = i < 10
   `lb`   - lower bound on cost
   `ub`   - upper bound on cost
   `dontstop` - boolean valued function determines when to continue optimization
-""" ->
+"""
 function minimize{T<:Real}(ctx::Context, obj::Ex{T}, vars::Ex...;
                           lb::T = typemin(T),
                           ub::T = typemax(T),
@@ -38,22 +38,23 @@ function minimize{T<:Real}(ctx::Context, obj::Ex{T}, vars::Ex...;
     current_lb, current_ub = lhalf.l, lhalf.u
     add!(ctx,(obj >= current_lb) & (obj <= current_ub))
 
-    # if SAT, optimal cost is the lower half, split lower half next iteration 
-    if is_satisfiable(ctx)
+    println("checking")
+    # if SAT, optimal cost is the lower half, split lower half next iteration
+    if @show is_satisfiable(ctx)
       last_test_issat = true
 
       # Actually, we know that optimal cost must be less than the cost
       # found from the last test. Use that as an upper bound for effiency
       amodel = model(ctx,obj,vars...)
       cost = amodel[1]
-      optimal_model = amodel[2:end] 
+      optimal_model = amodel[2:end]
       # cost_bounds = Interval(cost.l, current_ub)
-      cost_bounds = Interval(current_lb, cost.u)
+      @show cost_bounds = Interval(current_lb, cost.u)
     else
       # Otherwise it must be in the upperhalf, split upper half next iteration
       last_test_issat = false
       # cost_bounds = lhalf
-      cost_bounds = uhalf 
+      @show  cost_bounds = uhalf
     end
 
     push!(history, cost_bounds)
@@ -70,7 +71,7 @@ function minimize{T<:Real}(ctx::Context, obj::Ex{T}, vars::Ex...;
     !is_satisfiable() && error("Should be satisfiable, cost must be within $(history[end])")
     amodel = model(ctx,obj,vars...)
     cost = amodel[1]
-    optimal_model = amodel[2:end] 
+    optimal_model = amodel[2:end]
     pop_ctx!(ctx)
     return cost, optimal_model
   end
