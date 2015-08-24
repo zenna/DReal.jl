@@ -1,4 +1,4 @@
-version = "3.15.07.02"
+version = "3.15.08"
 os_string = @osx? "darwin" : "linux"
 extension = @osx? "zip" : "tar.gz"
 
