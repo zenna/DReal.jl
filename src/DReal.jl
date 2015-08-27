@@ -46,6 +46,7 @@ import Base:  abs, exp, log,
 
 import Base: ifelse
 import Base: convert, push!
+import Base: ==, >=, <=, >, <, /, -, +, *, &, |, !
 
 export
   Context,
