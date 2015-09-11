@@ -82,11 +82,9 @@ include("environment.jl")
 include("expression.jl")
 include("construct.jl")
 include("optimize.jl")
+include("ode.jl")
 include("SolverInterface.jl")
 include("util.jl")
-
-
-
 
 export
   qf_uf,         # Uninterpreted Functions

@@ -10,7 +10,9 @@ tests = ["ex1capi",
          "ifelse",
          "leak",
          "leaks2",
-         "leaks4"
+         "leaks4",
+         "ode1capi",
+         "odeball"
          ]
 
 println("Running tests:")
