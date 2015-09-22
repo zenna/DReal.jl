@@ -305,3 +305,6 @@ function opensmt_mk_integral(
         Ptr{UInt8}),
         ctx, vars_t, time_l, time_u, vars_0, n, flowname)
 end
+
+opensmt_get_model_logprob(ctx::opensmt_context, e::opensmt_expr) =
+  ccall((:opensmt_get_model_logprob, "libdreal"), Float64, (Ptr{Void}, Ptr{Void}), ctx, e)
